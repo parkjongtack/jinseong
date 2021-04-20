@@ -6,7 +6,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	if (document.location.protocol == 'http:') {
-        document.location.href = document.location.href.replace('http:', 'https:');
+        //document.location.href = document.location.href.replace('http:', 'https:');
     }
 	$('.log-info').hover(function(){
         	$(this).find('.adInfoBoxDd').stop(true,true).slideDown(200);

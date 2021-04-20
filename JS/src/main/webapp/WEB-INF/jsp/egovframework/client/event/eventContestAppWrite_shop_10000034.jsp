@@ -338,6 +338,7 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 	                                    </tr>
                                     </tbody>
                                     <tbody>
+                                    <!-- 
                                     	<tr>
 	                                        <th scope="col" colspan="4">
 	                                        	<p style="font-weight: bold;">퀴즈!&nbsp;<span class="ft_or">(모두 답변해야 이벤트 접수가 가능합니다)</span></p>
@@ -361,8 +362,111 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 	                                        	</p>
 	                                        </td>
 	                                    </tr>
+	                                  -->
+	                                  
                                     </tbody>
                                 </table>
+								<div class="qa_box">
+                               		<ul class="qa_list">
+                               			<li>
+                               				<div class="qa_text">
+                               					<p>
+                               						<b>Q1</b>. 진승은 볼링을 사랑해주시는 볼러 여러분께 보답하고자 2달에 한번씩 지역 볼링장에서 대회를 개최합니다.<br/>고객 OO 페스티벌이라고 불리우는데, OO에 들어갈 알맞은 단어는 무엇일까요?
+                               					</p>
+                               				</div>
+                               				<div class="answer_box">
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="option1" value="대박" />
+                               							<span>1. 대박</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="option1" value="보답" />
+                               							<span>2. 보답</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="option1" value="행운" />
+                               							<span>3. 행운</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="option1" value="감사" />
+                               							<span>4. 감사</span>
+                               						</label>
+                               					</div>
+                               				</div>
+                               			</li>
+                               			<li class="color_list">
+                               				<div class="qa_text">
+                               					<p>
+                               						<b>Q2</b>. 진승에서는 볼링공을 제작할 때 색상부터 커버스톡 조합까지 여러가지를 고심하여 완성합니다.<br/>이제 여러분도 진승의 볼링공 기획자가 되어주세요! 볼링공의 색상부터 정해볼까요? 여러분이 선호하는 색상 3가지를 선택해주세요.
+                               					</p>
+                               				</div>
+                               				<div class="answer_box">
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="검정" />
+                               							<span>1. 검정</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="빨강" />
+                               							<span>2. 빨강</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="파랑" />
+                               							<span>3. 파랑</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="금색" />
+                               							<span>4. 금색</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="보라" />
+                               							<span>5. 보라</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="분홍" />
+                               							<span>6. 분홍</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="청록" />
+                               							<span>7. 청록</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="흰색" />
+                               							<span>8. 흰색</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="color_set[]" value="은색" />
+                               							<span>9. 은색</span>
+                               						</label>
+                               					</div>
+                               				</div>
+                               			</li>
+                               		</ul>
+                               	</div>
+                                                            
                             </div>
                             <div class="agree" style="display: none;">
                                 <p><input type="checkbox" id="agree" checked="checked"><label for="agree">개인정보 수집 및 정보제공동의 </label> <a href="javscript:viewLayer();" id="pop_txt">전문보기</a></p>

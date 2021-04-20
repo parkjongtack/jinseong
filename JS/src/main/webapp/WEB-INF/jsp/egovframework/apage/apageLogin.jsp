@@ -22,7 +22,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	if (document.location.protocol == 'http:') {
-        document.location.href = document.location.href.replace('http:', 'https:');
+        //document.location.href = document.location.href.replace('http:', 'https:');
     }
 
  	var isLogin = "${isLogin}";
@@ -65,7 +65,8 @@ function doLogin() {
 
 		},
 		error : function(data, status, err) {
-			alert("로그인에 실패하였습니다.");
+			console.log(data.reseponseText);
+			alert("로그인에 실패하였습니다.111");
 			return;
 		}
 	});

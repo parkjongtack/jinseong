@@ -523,6 +523,8 @@ public class EventManageController {
 		
 		EventManageVo svo= EventManageService.lb_getEventContestView(vo);
 		
+		System.out.println(svo.getCt_process());
+		
 		if(svo != null && (svo.getCt_process().equals("R") || svo.getCt_process().equals("S"))){
 			//첨부파일 리스트 가져오기
 			if(svo.getAtch_file_id() != null && !svo.getAtch_file_id().equals("")){

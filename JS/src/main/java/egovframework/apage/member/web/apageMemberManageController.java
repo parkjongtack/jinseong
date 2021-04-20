@@ -114,6 +114,11 @@ private Logger logger = Logger.getLogger(this.getClass());
 	@RequestMapping(value = "/apage.do")
 	public String adminLogin(@ModelAttribute("vo") apageMemberManageVo vo, HttpServletRequest request, HttpServletResponse response, HttpSession session, ModelMap model) throws Exception {
 		
+		System.out.println("1234");
+		System.out.println(sha.encryption("1234"));
+		
+		
+		
 		boolean isLogin = false;
 		apageMemberManageVo mv = (apageMemberManageVo) session.getAttribute("adminInfo");
 		

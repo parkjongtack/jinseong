@@ -29,7 +29,7 @@
 		<!-- 
 		<property name="url" value="jdbc:mysql://db-12r53.cdb.ntruss.com:3306/jshome?allowMultiQueries=true" />
 	    -->
-		<property name="url" value="jdbc:mysql://localhost:3306/jshome?allowMultiQueries=true" />	    
+		<property name="url" value="jdbc:mysql://localhost:3306/jshome?allowMultiQueries=true&amp;autoReconnection=true&amp;serverTimezone=UTC&amp;characterEncoding=UTF-8" />	    
 		<!-- 
 		<property name="username" value="jshome"/>
 	        <property name="password" value="JShome!@#$"/>
@@ -71,7 +71,7 @@
 	        <property name="username" value="jshome"/>
 	        <property name="password" value="JShome!@#$"/>
  -->
-	        <property name="url" value="jdbc:mysql://localhost:3306/jshome?allowMultiQueries=true" />
+	        <property name="url" value="jdbc:mysql://localhost:3306/jshome?allowMultiQueries=true&amp;autoReconnection=true&amp;serverTimezone=UTC&amp;characterEncoding=UTF-8" />
 	        <property name="username" value="root"/>
 	        <property name="password" value="asom!@34"/>
 
@@ -92,7 +92,7 @@
         <property name="username" value="bowlingShop"/>
         <property name="password" value="bowlingshop!@#$"/>
 		 -->
-        <property name="url" value="jdbc:mysql://localhost:3306/bowlingshop?allowMultiQueries=true&amp;autoReconnection=true" />
+        <property name="url" value="jdbc:mysql://localhost:3306/bowlingshop?allowMultiQueries=true&amp;autoReconnection=true&amp;serverTimezone=UTC&amp;characterEncoding=UTF-8" />
         <property name="username" value="root"/>
         <property name="password" value="asom!@34"/>	 	 
 

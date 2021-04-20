@@ -280,7 +280,7 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
                                         <col width="35%">
                                     </colgroup>
                                     <tbody>
-                                        <tr <c:if test="${contestView.ct_type ne 'L' }"> style="display: none;"</c:if>>
+                                        <%-- <tr <c:if test="${contestView.ct_type ne 'L' }"> style="display: none;"</c:if>>
                                             <th scope="col"><span class="ft_or">* </span><label for="part">선수선택</label></th>
                                             <td colspan="3">
                                             	<c:choose>
@@ -304,7 +304,7 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
                                             		</c:when>
                                             	</c:choose>
                                             </td>
-                                        </tr>
+                                        </tr> --%>
                                         <tr>
                                        	    <th scope="col"><label for="join_name">아이디</label></th>
                                             <td>
@@ -334,7 +334,7 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 												<p style="color: red;">※대회 신청 후 유선상 성별 변경이 가능합니다.</p>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <%-- <tr>
                                         	<th scope="col"><label for="birth">생년월일</label></th>
                                             <td>
                                             	
@@ -353,7 +353,7 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 		                                            <input type="text" name="eng_first_name" id="eng_first_name"  maxlength="30" class="wd60p"/>
                                             	</label>
                                             </td>
-                                        </tr>
+                                        </tr> --%>
                                         <tr>
 	                                        <th scope="col" rowspan="2"><span class="ft_or">* </span><label for="zip1">주소</label></th>
 	                                        <td colspan="3">
@@ -367,7 +367,7 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 	                                        	<input type="text" id="addr_detail" name="addr_detail" class="type-text required w98p" title="상세주소" value="">
 	                                        </td>
 	                                    </tr>
-                                        <tr>
+                                        <!-- <tr>
 	                                        <th scope="col"><span class="ft_or">* </span><label for="option1">티셔츠 사이즈</label></th>
 	                                        <td colspan="3">	
 	                                        	<select id="option1" name="option1" class="wd50p">
@@ -397,11 +397,112 @@ function jusoCallBack(roadFullAddr,roadAddrPart1,addrDetail,roadAddrPart2,engAdd
 													<option value="gold">골드</option>
                                                 </select>
 	                                        </td>
-	                                    </tr>
+	                                    </tr> -->
 	                                    
                                     </tbody>
                                 </table>
+                               	
                             </div>
+                            <div class="qa_box">
+                               		<ul class="qa_list">
+                               			<li>
+                               				<div class="qa_text">
+                               					<p>
+                               						<b>Q1</b>. 진승은 볼링을 사랑해주시는 볼러 여러분께 보답하고자 2달에 한번씩 지역 볼링장에서 대회를 개최합니다.<br/>고객 OO 페스티벌이라고 불리우는데, OO에 들어갈 알맞은 단어는 무엇일까요?
+                               					</p>
+                               				</div>
+                               				<div class="answer_box">
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="answer01" value="1" />
+                               							<span>1. 대박</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="answer01" value="2" />
+                               							<span>2. 보답</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="answer01" value="3" />
+                               							<span>3. 행운</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="radio" name="answer01" value="4" />
+                               							<span>4. 감사</span>
+                               						</label>
+                               					</div>
+                               				</div>
+                               			</li>
+                               			<li class="color_list">
+                               				<div class="qa_text">
+                               					<p>
+                               						<b>Q2</b>. 진승에서는 볼링공을 제작할 때 색상부터 커버스톡 조합까지 여러가지를 고심하여 완성합니다.<br/>이제 여러분도 진승의 볼링공 기획자가 되어주세요! 볼링공의 색상부터 정해볼까요? 여러분이 선호하는 색상 3가지를 선택해주세요.
+                               					</p>
+                               				</div>
+                               				<div class="answer_box">
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="1" />
+                               							<span>1. 검정</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="2" />
+                               							<span>2. 빨강</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="3" />
+                               							<span>3. 파랑</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="4" />
+                               							<span>4. 금색</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="5" />
+                               							<span>5. 보라</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="6" />
+                               							<span>6. 분홍</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="7" />
+                               							<span>7. 청록</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="8" />
+                               							<span>8. 흰색</span>
+                               						</label>
+                               					</div>
+                               					<div class="line_">
+                               						<label>
+                               							<input type="checkbox" name="" value="9" />
+                               							<span>9. 은색</span>
+                               						</label>
+                               					</div>
+                               				</div>
+                               			</li>
+                               		</ul>
+                               	</div>
                             <div class="agree" style="display: none;">
                                 <p><input type="checkbox" id="agree" checked="checked"><label for="agree">개인정보 수집 및 정보제공동의 </label> <a href="javscript:viewLayer();" id="pop_txt">전문보기</a></p>
                             </div>
