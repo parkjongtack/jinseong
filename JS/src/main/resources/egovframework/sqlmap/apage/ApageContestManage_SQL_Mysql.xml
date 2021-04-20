@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ApageContestManage">
+	<typeAlias  alias="apageBoardManageVo" type="egovframework.apage.board.service.apageBoardManageVo"/>
+	
+		
+	<!-- 대회신청자 랜덤 -->
+	<update id="createRandomSelect" parameterClass="ApageBoardManageVo" >
+	<!-- 
+		UPDATE contest_app a
+			,(
+			  SELECT app_seq FROM contest_app WHERE ct_seq = #ct_seq# and status='0002' order by RAND() and part=#part# LIMIT #limit_part# 
+			  ) b
+		SET a.status = '0004', updt_dt = NOW(), updt_id = #updt_id#
+		WHERE a.app_seq = b.app_seq
+	 -->
+		UPDATE contest_app a
+			,(
+				SELECT q.app_seq
+				FROM(
+					SELECT app_seq  ,FLOOR(1 + (RAND() * 100)) AS RANDUM_NO 
+					FROM contest_app 
+					WHERE ct_seq = #ct_seq#
+					AND STATUS='0002' 
+					AND part= #part#
+					ORDER BY RANDUM_NO ASC
+					LIMIT #limit_part#
+				) q
+			  ) b
+		SET a.status = '0004', updt_dt = NOW(), updt_id = #updt_id#
+		WHERE a.app_seq = b.app_seq
+	</update>	
+	
+	<!-- 대회신청자 랜덤 -->
+	<update id="createRandomWaitingSelect" parameterClass="ApageBoardManageVo" >
+		UPDATE contest_app a
+			,(
+				SELECT q.app_seq,@ROWNUM := @ROWNUM + 1 AS ROWNUM
+				FROM(
+				SELECT app_seq  ,FLOOR(1 + (RAND() * 100)) AS RANDUM_NO 
+				FROM contest_app 
+				WHERE ct_seq = #ct_seq#
+				AND STATUS='0002'
+				AND part= #part#
+				ORDER BY RANDUM_NO ASC
+				LIMIT #limit_waiting#
+				) q ,(SELECT @ROWNUM := 0) R	
+			  ) b
+		SET a.status = '0005', updt_dt = NOW(), updt_id = #updt_id# , a.waiting_num = b.rownum
+		WHERE a.app_seq = b.app_seq
+	</update>	
+	
+</sqlMap>	

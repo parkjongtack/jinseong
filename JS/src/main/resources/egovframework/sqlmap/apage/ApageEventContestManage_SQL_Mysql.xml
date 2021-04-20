@@ -1,0 +1,1228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ApageEventManage">
+	<typeAlias  alias="ApageEventManageVo" type="egovframework.apage.event.service.ApageEventManageVo"/>
+	
+	
+	<!-- 대회신청 리스트 -->
+	<select id="selectEventContestManageList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			Z.*
+			,(SELECT COUNT(*) FROM event_contest_app WHERE ct_seq = Z.CT_SEQ) AS APP_CNT
+			,(SELECT COUNT(*) FROM event_contest_app WHERE ct_seq = Z.CT_SEQ AND STATUS = '0004') AS part1_app_cnt
+		FROM (
+			SELECT
+				 ecm.CT_SEQ
+				,ecm.CT_TYPE
+				,ecm.CT_SBJ
+				,ecm.CT_CONTENT
+				,ecm.CT_PLACE
+				,ecm.CT_DT
+				,ecm.CT_PROCESS
+				,ecm.ATCH_FILE_ID
+				,ecm.LIMIT_PART
+				,ecm.HIT
+				,ecm.CHECK_YN
+				,ecm.USE_AT
+				,DATE_FORMAT(ecm.reg_dt, '%Y-%m-%d') AS REG_DT
+				,ecm.REG_ID
+				,DATE_FORMAT(ecm.updt_dt, '%Y-%m-%d') AS UPDT_DT 
+				,ecm.UPDT_ID
+				,DATE_FORMAT(ecm.app_start_dt, '%Y-%m-%d') AS APP_START_DT
+				,ecm.APP_START_H
+				,ecm.APP_START_M
+				,DATE_FORMAT(ecm.app_end_dt, '%Y-%m-%d') AS APP_END_DT
+				,ecm.APP_END_H
+				,ecm.APP_END_M
+				,ecm.PREPARE_YN
+				,ecm.CT_GROUP
+				,ecm.situation_show_yn
+				,ecm.lane_num
+				,(SELECT CASE WHEN ecm.ct_type = 'L' THEN COUNT(1) ELSE '1' END AS cnt FROM event_contest_part ecp WHERE ecp.ct_seq = ecm.ct_seq) AS part_cnt
+			FROM event_contest_manage ecm
+			WHERE 1 = 1
+			AND ecm.ct_type IN 
+			<iterate open="(" close=")" property="ct_type_arr" conjunction=",">
+			 	#ct_type_arr[]#
+			</iterate>   
+			ORDER BY ecm.ct_seq DESC
+			LIMIT #currRow# , 10
+		) Z
+	</select>
+	
+	
+	
+	<!-- 대회신청 리스트 카운트 -->
+	<select id="selectEventContestManageListCnt" parameterClass="ApageEventManageVo" resultClass="int" >
+		SELECT COUNT(1) CNT 
+		FROM event_contest_manage
+		where 1=1
+		AND ct_type IN 
+		<iterate open="(" close=")" property="ct_type_arr" conjunction=",">
+		 	#ct_type_arr[]#
+		</iterate>   
+	</select>
+	
+	
+		
+	<!-- 대회 인서트 -->
+	<insert id="insertEventContestManageInfo" parameterClass="ApageEventManageVo" >
+		 insert into event_contest_manage
+         	(
+				 ct_sbj
+				 , ct_type
+				 , ct_content
+				 , ct_place
+				 , ct_dt
+				 , check_yn
+				 , ct_process
+				 , limit_part
+				 , limit_waiting 
+				 , atch_file_id
+				 , reg_id
+				 , reg_dt
+				 , app_start_dt
+				 , app_start_h
+				 , app_start_m
+				 , app_end_dt
+				 , app_end_h
+				 , app_end_m
+				 , prepare_yn
+				 , ct_group
+				 ,updt_yn
+			
+				,ct_bank
+				,ct_acchholder
+				,ct_account
+				,ct_price
+				,ct_deposit_stdt
+				,ct_deposit_sth
+				,ct_deposit_stm
+				,ct_deposit_eddt
+				,ct_deposit_edh
+				,ct_deposit_edm
+				,use_at
+				
+				,refund_finish_date
+				,refund_finish_h
+				,refund_finish_m
+				,situation_show_yn
+				,lane_num
+             )
+         VALUES
+	         (
+				 #ct_sbj#
+				 , #ct_type#
+				 , #ct_content#
+				 , #ct_place#
+				 , #ct_dt#
+				 , #check_yn#
+				 , #ct_process#
+				 , #limit_part#
+				 , #limit_waiting# 
+				 , #atch_file_id#
+				 , #reg_id#
+				 , now()
+				 , #app_start_dt#
+				 , #app_start_h#
+				 , #app_start_m#
+				 , #app_end_dt#
+				 , #app_end_h#
+				 , #app_end_m#
+				 , #prepare_yn# 
+			 	 ,(select max(ct_seq)+1 from event_contest_manage ALIAS_FOR_SUBQUERY)
+				 , #updt_yn#
+			 	,#ct_bank#
+				,#ct_acchholder#
+				,#ct_account#
+				,#ct_price#
+				,#ct_deposit_stdt#
+				,#ct_deposit_sth#
+				,#ct_deposit_stm#
+				,#ct_deposit_eddt#
+				,#ct_deposit_edh#
+				,#ct_deposit_edm#
+				,#use_at#
+				
+				,#refund_finish_date#
+				,#refund_finish_h#
+				,#refund_finish_m#
+				,#situation_show_yn#
+				,#lane_num#
+	         )
+	    <selectKey keyProperty="ct_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+
+
+
+
+	<!-- 이벤트 대회 프리미엄 레슨 파트 정보 등록 -->
+	<insert id="insertEventContestLeassonPartInfo" parameterClass="ApageEventManageVo" >
+		 insert into event_contest_part
+         	(
+         		 ct_seq
+         		,part_name
+         		,part_ord
+             )
+         VALUES
+	         (
+				 #ct_seq#
+				,#part_name#
+				,#part_ord#
+	         )
+	    <selectKey keyProperty="ecp_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	
+	<!-- //이벤트 대회 프리미엄 레슨 파트 정보 리스트 -->
+	<select id="selectEventContestLeassonPartList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+			SELECT
+				ecp_seq
+				,ct_seq
+				,part_name
+				,part_ord
+			FROM event_contest_part
+			WHERE ct_seq = #ct_seq#
+			ORDER BY part_ord ASC
+	</select>
+	
+	
+	<!-- 이벤트 대회 프리미엄 상세페이지 -->
+	<select id="selectEventContestManageDetail" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+	SELECT *
+		FROM(
+				SELECT
+					 CT_SEQ
+					,CT_TYPE
+					,CT_SBJ
+					,CT_CONTENT
+					,CT_PLACE
+					,CT_DT
+					,CT_PROCESS
+					,ATCH_FILE_ID
+					,LIMIT_PART
+					,HIT
+					,CHECK_YN
+					,USE_AT
+					,ifnull(LIMIT_WAITING,0) as LIMIT_WAITING
+					,DATE_FORMAT(reg_dt, '%Y-%m-%d') AS REG_DT
+					,REG_ID
+					,DATE_FORMAT(updt_dt, '%Y-%m-%d') AS UPDT_DT 
+					,UPDT_ID	
+					,DATE_FORMAT(app_start_dt, '%Y-%m-%d') AS APP_START_DT
+					,APP_START_H
+					,APP_START_M
+					,DATE_FORMAT(app_end_dt, '%Y-%m-%d') AS APP_END_DT
+					,APP_END_H
+					,APP_END_M
+					,PREPARE_YN
+					,CT_GROUP
+					,UPDT_YN
+					,ct_bank
+					,ct_acchholder
+					,ct_account
+					,ct_price
+					,DATE_FORMAT(ct_deposit_stdt, '%Y-%m-%d') AS ct_deposit_stdt
+					,ct_deposit_sth
+					,ct_deposit_stm
+					,DATE_FORMAT(ct_deposit_eddt, '%Y-%m-%d') AS ct_deposit_eddt
+					,ct_deposit_edh
+					,ct_deposit_edm
+					,DATE_FORMAT(ct_sms_send_dt, '%Y%m') AS ct_sms_send_dt
+					,DATE_FORMAT(ct_sms_send_dt, '%Y-%m-%d') AS ct_sms_send_dt2
+					,EXPOSE_YN
+					,CUT_YN
+					,DATE_FORMAT(ct_lane_sms_send_dt, '%Y%m') AS ct_lane_sms_send_dt
+					,DATE_FORMAT(ct_lane_sms_send_dt, '%Y-%m-%d') AS ct_lane_sms_send_dt2
+					
+					,DATE_FORMAT(refund_finish_date, '%Y-%m-%d') AS refund_finish_date
+					,refund_finish_h
+					,refund_finish_m
+					,situation_show_yn
+					,result_sms_send_yn
+ 					,lane_sms_send_yn
+ 					,lane_num
+				FROM event_contest_manage
+				WHERE CT_SEQ = #ct_seq#
+		) CM
+	</select>
+		
+		
+		
+		
+	<!-- 이벤트 대회 수정 -->
+	<update id="updateEventContestManageInfo" parameterClass="ApageEventManageVo" >
+		UPDATE event_contest_manage SET
+		updt_id = #updt_id#
+		,updt_dt = now()
+		<isNotEmpty property="ct_sbj">
+		,ct_sbj	= #ct_sbj#
+		</isNotEmpty>
+		<isNotEmpty property="ct_type">
+		,ct_type	= #ct_type#
+		</isNotEmpty>
+		<isNotEmpty property="ct_content">
+		,ct_content	= #ct_content#
+		</isNotEmpty>
+		<isNotEmpty property="ct_place">
+		,ct_place	= #ct_place#
+		</isNotEmpty>
+		<isNotEmpty property="ct_dt">
+		,ct_dt	= #ct_dt#
+		</isNotEmpty>
+		<isNotEmpty property="ct_process">
+		,ct_process	= #ct_process#
+			<isEqual property="ct_process" compareValue="R" >
+				<isNotEmpty property="ct_group">
+					,ct_group = #ct_group#
+				</isNotEmpty>
+ 	 		</isEqual>
+		</isNotEmpty>
+		<isNotEmpty property="limit_part">
+		,limit_part	= #limit_part#
+		</isNotEmpty>
+		<isNotEmpty property="limit_waiting">
+		,limit_waiting =	#limit_waiting#
+		</isNotEmpty>	
+		<isNotEmpty property="atch_file_id">
+		,atch_file_id =	#atch_file_id#
+		</isNotEmpty>	
+		<isNotEmpty property="app_start_dt">
+		,app_start_dt =	#app_start_dt#
+		</isNotEmpty>	
+		<isNotEmpty property="app_start_h">
+		,app_start_h =	#app_start_h#
+		</isNotEmpty>	
+		<isNotEmpty property="app_start_m">
+		,app_start_m =	#app_start_m#
+		</isNotEmpty>	
+		<isNotEmpty property="app_end_dt">
+		,app_end_dt =	#app_end_dt#
+		</isNotEmpty>	
+		<isNotEmpty property="app_end_h">
+		,app_end_h =	#app_end_h#
+		</isNotEmpty>	
+		<isNotEmpty property="app_end_m">
+		,app_end_m =	#app_end_m#
+		</isNotEmpty>	
+		<isNotEmpty property="prepare_yn">
+		,prepare_yn =	#prepare_yn#
+		</isNotEmpty>	
+		<isNotEmpty property="updt_yn">
+		,updt_yn = #updt_yn#
+		</isNotEmpty>
+
+
+		<isNotEmpty property="ct_bank">
+		,ct_bank = #ct_bank#
+		</isNotEmpty>
+		<isNotEmpty property="ct_acchholder">
+		,ct_acchholder = #ct_acchholder#
+		</isNotEmpty>
+		<isNotEmpty property="ct_account">
+		,ct_account = #ct_account#
+		</isNotEmpty>
+		<isNotEmpty property="ct_price">
+		,ct_price = #ct_price#
+		</isNotEmpty>
+		<isNotEmpty property="ct_deposit_stdt">
+		,ct_deposit_stdt = #ct_deposit_stdt#
+		</isNotEmpty>
+		<isNotEmpty property="ct_deposit_sth">
+		,ct_deposit_sth = #ct_deposit_sth#
+		</isNotEmpty>
+		<isNotEmpty property="ct_deposit_stm">
+		,ct_deposit_stm = #ct_deposit_stm#
+		</isNotEmpty>
+		<isNotEmpty property="ct_deposit_eddt">
+		,ct_deposit_eddt = #ct_deposit_eddt#
+		</isNotEmpty>
+		<isNotEmpty property="ct_deposit_edh">
+		,ct_deposit_edh = #ct_deposit_edh#
+		</isNotEmpty>
+		<isNotEmpty property="ct_deposit_edm">
+		,ct_deposit_edm = #ct_deposit_edm#
+		</isNotEmpty>
+		<isNotEmpty property="use_at">
+		,use_at = #use_at#
+		</isNotEmpty>
+				
+		<isNotEmpty property="refund_finish_date">
+		,refund_finish_date = #refund_finish_date#
+		</isNotEmpty>
+		<isNotEmpty property="refund_finish_h">
+		,refund_finish_h = #refund_finish_h#
+		</isNotEmpty>
+		<isNotEmpty property="refund_finish_m">
+		,refund_finish_m = #refund_finish_m#
+		</isNotEmpty>
+		<isNotEmpty property="situation_show_yn">
+		,situation_show_yn = #situation_show_yn#
+		</isNotEmpty>
+		<isNotEmpty property="lane_num">
+		,lane_num = #lane_num#
+		</isNotEmpty>
+		
+		WHERE ct_seq = #ct_seq#		
+	</update>
+	
+	
+	<!-- 이벤트 대회 프리미엄 레슨 파트 정보 삭제 -->
+	<delete id="deleteEventContestManagePartInfoArr" parameterClass="ApageEventManageVo">
+		delete from event_contest_part 
+		where ct_seq = #ct_seq#
+		and ecp_seq not in
+		<iterate open="(" close=")" property="ecp_seq_arr" conjunction=",">
+		 	#ecp_seq_arr[]#
+		</iterate>   
+	</delete>
+	
+	<!-- 이벤트 대회 프리미엄 레슨 파트 정보 삭제 -->
+	<delete id="deleteEventContestManagePartInfoAll" parameterClass="ApageEventManageVo">
+		delete from event_contest_part 
+		where ct_seq = #ct_seq#
+	</delete>
+	
+	<!-- 이벤트 대회 파트 정보 수정 -->
+	<update id="updateEventContestManagePartInfo" parameterClass="ApageEventManageVo" >
+		update event_contest_part set
+			part_name = #part_name#
+			,part_ord = #part_ord#
+		where ecp_seq = #ecp_seq#
+	</update>
+	
+	<!-- 이벤트 대회 정보 삭제 -->
+	<delete id="deleteEventContestManageInfo" parameterClass="ApageEventManageVo">
+		delete from event_contest_manage 
+		where ct_seq = #ct_seq#
+	</delete>
+	
+	
+	<!-- 첨부파일 초기화 -->
+	<update id="updateEventContestFile" parameterClass="ApageEventManageVo" >
+		UPDATE event_contest_manage SET
+		atch_file_id =	NULL
+		WHERE ct_seq = #ct_seq#		
+	</update>	
+	
+	<!-- //이벤트 대회 신청자 리스트JSON -->
+	<select id="selectAdminEventContestAppList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+						SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+						FROM (
+								SELECT
+								  app_seq, ct_seq, join_name, deposit_name,
+								  birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+								  disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+								  ,IFNULL(waiting_num,0) as waiting_num
+								  ,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f ,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l
+								  ,IFNULL(pay_flag,'N') as pay_flag	    
+								  ,IFNULL(app_sms_flag,'N') as app_sms_flag	    
+								  ,app_sms_date
+								  ,option1 ,option2 ,option3 ,option4 ,option5 ,option6
+								  ,zipcode ,addr ,addr_detail ,eng_first_name ,eng_last_name
+								  ,reg_turn
+								FROM event_contest_app
+							 	WHERE 1 = 1
+							 	AND ct_seq = #ct_seq#
+								 	<isNotNull property="part">
+								 		<isNotEmpty property="part">
+								 	 	AND part = #part#			
+									 	</isNotEmpty>
+								 	</isNotNull>
+								 	<isNull property="status">
+								 	 	ORDER BY app_seq, reg_dt ASC
+							 	 	</isNull>			
+							 	 	<isNotNull property="status">
+								 	 	<isNotEmpty property="status">
+								 	 		AND STATUS = #status#
+								 	 		<isEqual property="status" compareValue="0005" >
+									 			ORDER BY waiting_num ASC
+								 	 		</isEqual>
+								 	 		<isNotEqual property="status" compareValue="0005" >
+									 			ORDER BY app_seq, reg_dt ASC
+								 	 		</isNotEqual>
+								 		</isNotEmpty>
+							 	 	</isNotNull>	
+						)X,(SELECT @ROWNUM := 0) R	
+				  ) Y
+		     ) Z
+	</select>
+	
+	
+	
+	
+	<!-- 이벤트 대회신청자 정보 수정 -->
+	<update id="updateAdminEventContestApp" parameterClass="ApageEventManageVo" >
+		UPDATE event_contest_app SET
+			updt_id = #updt_id#
+			,updt_dt = now()	
+			<isNotEmpty property="birth">
+			,birth	= #birth#
+			</isNotEmpty>	
+			<isNotEmpty property="part">
+			,part	= #part#
+			</isNotEmpty>	
+			<isNotEmpty property="telno">
+			,telno	= fn_encrypt(#telno#)
+			</isNotEmpty>
+			<isNotEmpty property="gender">
+			,gender	= #gender#
+			</isNotEmpty>
+			<isNotEmpty property="email">
+			,email	= fn_encrypt(#email#)
+			</isNotEmpty>
+			<isNotEmpty property="disable_yn">
+			,disable_yn	= #disable_yn#
+			</isNotEmpty>
+			<isNotEmpty property="handicap">
+			,handicap	= #handicap#
+			</isNotEmpty>
+			<isNotEmpty property="lane">
+			,lane	= #lane#
+			</isNotEmpty>
+			<isNotEmpty property="status">
+				,status	= #status#
+				<isNotEqual property="status" compareValue="0005" >
+					,waiting_num = 0
+	 	 		</isNotEqual>
+	 	 		<isEqual property="status" compareValue="0003" >
+	 	 			<isNotEqual property="origin_status" compareValue="0003" >
+						,ct_group = CONCAT(ct_group,'_',app_seq)
+						,cancel_date = NOW()
+	 	 			</isNotEqual>
+	 	 		</isEqual>
+			</isNotEmpty>
+			<isNotEmpty property="pay_flag">
+			,pay_flag	= #pay_flag#
+			</isNotEmpty>
+			<isNotEmpty property="option1">
+			,option1	= #option1#
+			</isNotEmpty>
+			<isNotEmpty property="option2">
+			,option2	= #option2#
+			</isNotEmpty>
+			<isNotEmpty property="option3">
+			,option3	= #option3#
+			</isNotEmpty>
+			<isNotEmpty property="option4">
+			,option4	= #option4#
+			</isNotEmpty>
+			<isNotEmpty property="option5">
+			,option5	= #option5#
+			</isNotEmpty>
+			<isNotEmpty property="option6">
+			,option6	= #option6#
+			</isNotEmpty>
+			<isNotEmpty property="zipcode">
+			,zipcode	= #zipcode#
+			</isNotEmpty>
+			<isNotEmpty property="addr">
+			,addr	= #addr#
+			</isNotEmpty>
+			<isNotEmpty property="addr_detail">
+			,addr_detail	= #addr_detail#
+			</isNotEmpty>
+			<isNotEmpty property="eng_first_name">
+			,eng_first_name	= #eng_first_name#
+			</isNotEmpty>
+			<isNotEmpty property="eng_last_name">
+			,eng_last_name	= #eng_last_name#
+			</isNotEmpty>
+		WHERE app_seq = #app_seq#		
+	</update>
+	
+	
+	
+	<!-- 회원관리 > 이벤트 대회 신청 이력 상세 -->
+	<select id="apageGetEventContestInfoDetailOfEachMember" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo">
+		SELECT
+			 app_seq
+			,ct_seq
+			,join_name
+			,deposit_name
+			,birth
+			,gender
+			,telno AS telno_string <!-- telno가 암호화되지 않고 들어간 데이터들이 있음. -->
+			,fn_decrypt(telno) as telno
+			,fn_decrypt(email) as email
+			,disable_yn
+			,handicap
+			,part
+			,lane
+			,status
+			,waiting_num
+			,reg_id
+			,reg_dt
+			,pay_flag
+			,refund_bank
+			,refund_accholder
+			,refund_account
+			,DATE_FORMAT(cancel_date, '%Y-%m-%d') cancel_date
+			,reg_turn
+			,(SELECT part_ord FROM event_contest_part WHERE ecp_seq = part) AS part_ord
+		FROM event_contest_app
+		WHERE app_seq = #app_seq#
+		<!-- 
+		ct_seq = #ct_seq# 
+		AND reg_id = #reg_id#
+		 -->
+	</select>
+	
+	
+	<!-- //이벤트 대회 최우선 대기자 추출 -->	
+	<select id="apageGetEventCtPartWaitingInfo"  parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT 
+			app_seq, ct_seq, join_name, deposit_name,
+			birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+			disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+			,IFNULL(waiting_num,0) AS waiting_num	  
+			,(SELECT part_ord FROM event_contest_part WHERE ecp_seq = part) AS part_ord
+		FROM event_contest_app 
+		WHERE ct_seq = #ct_seq#
+		AND STATUS = '0005' 
+		AND waiting_num != 0 
+		AND part= #part#
+		ORDER BY waiting_num ASC
+		LIMIT 1	
+	</select>
+	
+		
+	<!-- //이벤트 대회 대회 선정자 취소시 대기인원 선정 업데이트 -->
+	<update id="updateEventContestWaitingToSelect" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_app a
+			,(
+				SELECT app_seq
+				FROM event_contest_app 
+				WHERE ct_seq = #ct_seq#
+				AND STATUS='0005' 
+				AND waiting_num != 0 
+				<!-- 
+				AND pay_flag = 'Y'
+				 -->
+				AND part= #part#
+				ORDER BY waiting_num ASC
+				LIMIT 1	
+			  ) b
+		SET a.status = '0004', updt_dt = NOW(), updt_id = #updt_id# , lane = #lane# , waiting_num = 0
+		WHERE a.app_seq = b.app_seq
+	</update>
+	
+	<!-- //이벤트 대회 대기자 이동시 대기번호 UPDATE -->
+	<update id="apageUpdateEventContestAppWaitingNum" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_app ca,
+			(SELECT (MAX(waiting_num)+1) as waiting_num FROM event_contest_app WHERE ct_seq = #ct_seq# AND part = #part#) ca2
+		SET 
+			 ca.waiting_num = ca2.waiting_num
+			 ,ca.lane = '' 
+		WHERE ca.app_seq = #app_seq#
+	</update>
+	
+	
+	<!-- 이벤트 대회 신청마감 후 랭키나열 후 상태 UPDATE -->
+	<update id="apageEventContestAppResultOrderStatusChange" parameterClass="ApageEventManageVo">
+	<![CDATA[
+			UPDATE event_contest_app capp,(
+			SELECT 
+				 rownum
+				,app_seq
+				,ct_seq
+				,part
+				,STATUS
+				,reg_id
+				,join_name
+				,reg_dt
+				,limit_part
+				,limit_waiting
+				,total_limit
+				,CASE 
+					WHEN rownum <= limit_part THEN '0004'
+					ELSE '0005'
+				END AS result_status
+				,CASE 
+					WHEN (rownum-limit_part) > 0 THEN (rownum-limit_part)
+					ELSE 0 
+				END AS waiting_num
+				
+			FROM (
+				SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+				FROM (
+					SELECT 
+						 ca.app_seq
+						,ca.ct_seq
+						,ca.status
+						,ca.reg_dt
+						,ca.join_name
+						,ca.reg_id
+						,part
+						,ca.waiting_num
+						,cm.limit_part
+						,cm.limit_waiting
+						,(cm.limit_part+cm.limit_waiting) AS total_limit
+					FROM event_contest_app ca
+					JOIN event_contest_manage cm
+					WHERE ca.ct_seq = cm.ct_seq
+					AND ca.status != '0003'
+					AND ca.ct_seq = #ct_seq#
+					AND ca.part = #part#
+					ORDER BY RAND()
+				)X,(SELECT @ROWNUM := 0) R
+			) Q
+		) uapp 
+		SET capp.status = uapp.result_status
+			,capp.waiting_num = uapp.waiting_num
+			,capp.updt_dt = now()
+			,capp.updt_id = #updt_id#
+		WHERE capp.app_seq = uapp.app_seq
+		AND capp.reg_id = uapp.reg_id
+		AND capp.ct_seq = uapp.ct_seq
+		]]>
+	</update>
+	
+	
+	
+	<!-- 이벤트 대회 신청자 삭제 -->
+	<delete id="deleteAdminEventContestApp" parameterClass="ApageEventManageVo">
+		DELETE FROM event_contest_app
+		WHERE app_seq = #app_seq#	
+	</delete>
+
+
+
+	<!-- 이벤트 대회 신청마감 리스트 -->
+	<select id="selectEventContestAppFinishList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			    Z.*
+			    ,(SELECT COUNT(*) FROM event_contest_app WHERE ct_seq = Z.CT_SEQ) AS APP_CNT
+				,(SELECT COUNT(*) FROM event_contest_app WHERE ct_seq = Z.CT_SEQ AND STATUS = '0004') AS part1_app_cnt
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+					FROM (
+							SELECT *
+							FROM(
+									SELECT
+										CT_SEQ
+										,CT_TYPE
+										,CT_SBJ
+										,CT_CONTENT
+										,CT_PLACE
+										,CT_DT
+										,CT_PROCESS
+										,ATCH_FILE_ID
+										,LIMIT_PART
+										,HIT
+										,CHECK_YN
+										,USE_AT
+										,DATE_FORMAT(reg_dt, '%Y-%m-%d') AS REG_DT
+										,REG_ID
+										,DATE_FORMAT(updt_dt, '%Y-%m-%d') AS UPDT_DT 
+										,UPDT_ID	
+										,(select case when ct_type = 'L' then count(1) else '1' end as cnt from event_contest_part where ct_seq = ct_seq) as part_cnt
+									FROM event_contest_manage
+									WHERE (ct_process = 'E' OR ct_process = 'F')
+									AND ct_type IN 
+									<iterate open="(" close=")" property="ct_type_arr" conjunction=",">
+									 	#ct_type_arr[]#
+									</iterate>
+									) CM
+					)X,(SELECT @ROWNUM := 0) R			 
+				 	 WHERE 1 = 1
+					ORDER BY ct_seq DESC
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 이벤트 대회 신청마감 리스트카운트 -->
+	<select id="selectEventContestAppFinishListCnt" parameterClass="ApageEventManageVo" resultClass="int" >
+		SELECT COUNT(*) CNT
+		FROM event_contest_manage
+		WHERE (ct_process = 'E' OR ct_process = 'F')
+		AND ct_type IN 
+		<iterate open="(" close=")" property="ct_type_arr" conjunction=",">
+		 	#ct_type_arr[]#
+		</iterate>
+	</select>
+	
+		
+	<!-- 이벤트 대회 업데이트 완료 후 대회 ROWNUM 정렬 플래그 cut_yn ==> Y로 변경 -->
+	<update id="apageEventContestCutYnUpdate" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_manage SET
+			CUT_YN = #cut_yn#
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+	<!-- 이벤트 대회 선정결과 노출여부 업데이트 -->
+	<update id="updateEventContestAppResultExposeYn" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_manage 
+		SET expose_yn = #expose_yn#		
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+		
+	<!-- //이벤트 대회 선정자 레인 랜덤배정 업데이트 -->
+	<update id="updateEventContestAppRandomLane" parameterClass="ApageEventManageVo">
+	  UPDATE event_contest_app SET 
+	  		lane = #lane#
+	  		,updt_dt = now()
+	  		,updt_id = #updt_id#
+	  WHERE APP_SEQ = #app_seq#
+	</update>
+	
+	
+	<!-- 이벤트 대회 선정자 랜덤 자리배치 리스트 -->
+	<select id="createEventContestRandomLane" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT Z.* FROM (
+					SELECT ROWNUM AS ASCNUM, Y.*
+					FROM(
+					
+					SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+					FROM (
+							SELECT 
+								lane, app_seq, ct_seq, join_name, deposit_name,
+								birth, case when gender = 'M' then '남' else '여' end as gender, 
+								fn_decrypt(telno) AS telno, fn_decrypt(email) AS email, 
+								disable_yn, handicap, part, STATUS
+							FROM event_contest_app
+							WHERE ct_seq = #ct_seq#
+							AND part = #part#
+							AND STATUS = '0004'
+							ORDER BY part,RAND()
+					)X,(SELECT @ROWNUM := 0) R							 	
+				) Y
+		) Z
+	</select>
+	
+	
+		
+	<!-- 이벤트 대회 선정자 리스트 엑셀 -->
+	<select id="selectEventContestSelectResultExcel" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			app_seq, ct_seq, join_name, deposit_name,
+			birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+			disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+			,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f
+			,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l	  
+			 ,option1 ,option2 ,option3 ,option4 ,option5 ,option6
+		  ,zipcode ,addr ,addr_detail ,eng_first_name ,eng_last_name
+		  ,(SELECT cp.part_name FROM event_contest_part cp WHERE cp.ecp_seq = cc.part AND cp.ct_seq = cc.ct_seq LIMIT 1) AS part_name
+		  ,cc.reg_turn
+		FROM event_contest_app cc
+		WHERE ct_seq = #ct_seq#
+		AND part = #part#
+		AND status = '0004'
+		ORDER BY lane_f*1,lane_l*1		
+	</select>
+	
+		
+	<!-- 이벤트 대회 대기자 리스트 엑셀 -->
+	<select id="selectEventContestSelectResultExcelStatusReady" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			app_seq, ct_seq, join_name, deposit_name,
+			birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+			disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+			,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f
+			,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l	  
+			 ,option1 ,option2 ,option3 ,option4 ,option5 ,option6
+		  ,zipcode ,addr ,addr_detail ,eng_first_name ,eng_last_name
+		  ,(SELECT cp.part_name FROM event_contest_part cp WHERE cp.ecp_seq = cc.part AND cp.ct_seq = cc.ct_seq LIMIT 1) AS part_name
+		  ,cc.reg_turn
+		  ,waiting_num
+		FROM event_contest_app cc
+		WHERE ct_seq = #ct_seq#
+		AND part = #part#
+		AND status = '0005'
+		ORDER BY waiting_num ASC
+	</select>
+	
+	
+	
+	<!-- //이벤트 대회 자리 배치 결과 노출여부 업데이트 -->
+	<update id="eventContestAppResultExposeYn" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_manage SET 
+			ct_result = #ct_result#
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+	
+	
+	<!-- //이벤트 대회 레인 랜덤배정 결과(선정,대기) -->
+	<select id="selectAdminEventContestRandomLaneResultList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+			 	 	SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+					FROM (
+							SELECT
+							  app_seq, ct_seq, join_name, deposit_name,
+							  birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+							  disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+							  ,IFNULL(waiting_num,0) as waiting_num
+							  ,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f ,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l
+							  ,IFNULL(pay_flag,'N') as pay_flag	    
+							  ,IFNULL(app_sms_flag,'N') as app_sms_flag	    
+							  ,app_sms_date
+							  ,IFNULL(app_lane_sms_flag,'N') as app_lane_sms_flag	    
+							  ,app_lane_sms_date
+							FROM event_contest_app
+							 WHERE ct_seq = #ct_seq#
+						 	 AND status = '0004'
+						 	 AND app_lane_sms_flag = 'N'
+					)X,(SELECT @ROWNUM := 0) R	
+				 	 WHERE 1 = 1
+				  ) Y
+		     ) Z
+	</select>
+	
+	
+	<!-- //이벤트 대회 레인 랜덤배정 문자발송일 업데이트 -->
+	<update id="apageUpdateEventContestRandomLaneMsgSendDate" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_manage SET 
+			 ct_lane_sms_send_dt = now() 
+			,lane_sms_send_yn = 'Y'
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+	<!-- 대회 레인 랜덤배정 문자발송여부 N 처리, 발송시간 UPDATE -->
+	<update id="apageUpdateEventContestRandomLaneSendFlagAndDate" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_app SET 
+			 app_lane_sms_flag = 'N'
+			,app_lane_sms_date = now()
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+	
+	<!-- //이벤트 대회 신청 결과(선정,대기) -->
+	<select id="selectAdminEventContestAppResultList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+			 	 	SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+					FROM (
+							SELECT
+							  app_seq, ct_seq, join_name, deposit_name,
+							  birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+							  disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+							  ,IFNULL(waiting_num,0) as waiting_num
+							  ,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f ,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l
+							  ,IFNULL(pay_flag,'N') as pay_flag	    
+							  ,IFNULL(app_sms_flag,'N') as app_sms_flag	    
+							  ,app_sms_date
+							  ,IFNULL(app_lane_sms_flag,'N') as app_lane_sms_flag	    
+							  ,app_lane_sms_date
+							  ,(SELECT part_ord FROM event_contest_part WHERE ecp_seq = part) AS part_ord
+							FROM event_contest_app
+							WHERE ct_seq = #ct_seq#
+						 	AND (status = '0005' OR status = '0004')
+						 	AND app_sms_flag = 'N'
+					)X,(SELECT @ROWNUM := 0) R	
+				 	 WHERE 1 = 1
+				  ) Y
+		     ) Z
+	</select>
+	
+	
+	<!-- //이벤트 대회 문자발송일 업데이트 -->
+	<update id="apageUpdateEventContestMsgSendDate" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_manage SET 
+			 ct_sms_send_dt = now()
+			,result_sms_send_yn = 'Y'
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+		
+	<!-- //대회신청 문자발송여부 N 처리, 발송시간 UPDATE -->
+	<update id="apageUpdateEventContestAppSendFlagAndDate" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_app SET 
+			 app_sms_flag = 'N'
+			,app_sms_date = now()
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+	
+	<!-- 이벤트 대회 대기자 재정렬 -->
+	<update id="apageEventContestAppWaitingNumReOrderring" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_app capp,(
+			SELECT *
+			FROM (
+				SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+				FROM (
+					SELECT 
+						 ca.app_seq
+						,ca.ct_seq
+						,ca.status
+						,ca.reg_dt
+						,ca.join_name
+						,ca.reg_id
+						,part
+						,ca.waiting_num
+						,cm.limit_part
+						,cm.limit_waiting
+						,(cm.limit_part+cm.limit_waiting) AS total_limit
+					FROM event_contest_app ca
+					JOIN event_contest_manage cm
+					WHERE ca.ct_seq = cm.ct_seq
+					AND ca.status = '0005'
+					AND ca.ct_seq = #ct_seq#
+					AND ca.part = #part#
+					ORDER BY ca.waiting_num ASC
+				)X,(SELECT @ROWNUM := 0) R
+			) Q
+		) uapp
+	
+		SET 
+			 capp.waiting_num = uapp.rownum
+		WHERE capp.app_seq = uapp.app_seq
+		AND capp.reg_id = uapp.reg_id
+		AND capp.ct_seq = uapp.ct_seq
+	</update>
+	
+	
+	
+	<!-- 왕중왕전 대회 참가자 인서트 -->
+	<insert id="insertEventContestAppTarget" parameterClass="ApageEventManageVo" >
+		 insert into event_contest_app_target
+         	(
+				 ct_seq
+				 ,ct_title
+				 ,t_rank
+				 ,t_name
+				 ,t_birth
+				 ,t_tel
+				 ,t_gender
+				 ,t_reg_id
+				 ,t_memo
+             )
+         VALUES
+	         (
+				 #ct_seq#
+				,#ct_title#
+				,#t_rank#
+				,#t_name#
+				,#t_birth#
+				,#t_tel#
+				,#t_gender#
+				,#t_reg_id#
+				,#t_memo#
+	         )
+	    <selectKey keyProperty="t_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+
+	
+	<!-- 왕중왕전 참가자 리스트 -->
+	<select id="selectEventContestTopRankerList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo">
+		select 
+			  t_seq,
+			  ct_seq,
+			  ct_title,
+			  t_rank,
+			  t_name,
+			  t_birth,
+			  t_tel,
+			  t_gender,
+			  t_reg_id,
+			  t_memo
+		from event_contest_app_target
+		where ct_seq = #ct_seq#
+		order by t_seq asc
+	</select>
+	
+	<!-- 왕중왕전 참가자 리스트 삭제 -->
+	<delete id="deleteEventContestAppTarget" parameterClass="ApageEventManageVo">
+		delete from event_contest_app_target
+		where ct_seq = #ct_seq#
+	</delete>
+	
+	<!-- 이벤트 대회 대회신청자 리스트 엑셀출력 -->
+	<select id="selectAdminEventContestAppExcel" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+			 	 		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+						FROM (
+								SELECT
+								  app_seq, ct_seq, join_name, deposit_name,
+								  birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+								  disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+								  ,IFNULL(waiting_num,0) as waiting_num
+								  ,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f ,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l
+								  ,IFNULL(pay_flag,'N') as pay_flag	    
+								  ,IFNULL(app_sms_flag,'N') as app_sms_flag	    
+								  ,app_sms_date
+								  ,option1 ,option2 ,option3 ,option4 ,option5 ,option6
+								  ,zipcode ,addr ,addr_detail ,eng_first_name ,eng_last_name
+								  ,(SELECT cp.part_name FROM event_contest_part cp WHERE cp.ecp_seq = cc.part AND cp.ct_seq = cc.ct_seq LIMIT 1) AS part_name
+								FROM event_contest_app cc
+						)X,(SELECT @ROWNUM := 0) R	
+				 	 WHERE 1 = 1
+				 	 AND ct_seq = #ct_seq#		
+					 ORDER BY part, app_seq
+				  ) Y
+		     ) Z
+	</select>
+	
+	
+	<!-- 접수현황노출 업데이트 -->
+	<update id="apageEventCotnestAppSituationShowUpdate" parameterClass="ApageEventManageVo">
+		UPDATE event_contest_manage SET
+		updt_id = #updt_id#
+		,updt_dt = now()
+		,situation_show_yn = #situation_show_yn#
+		WHERE ct_seq = #ct_seq#		
+	</update>
+	
+	
+	<!-- 사용자 왕중왕전 2차 접수  대회신청 -->
+	<procedure id="insertEventContestAppSecondTarget" parameterClass="ApageEventManageVo">
+    	{ CALL pc_event_contest_app_kok(
+    		#ct_seq# 
+    		,#join_name#
+    		,#deposit_name#
+    		,#birth#
+    		,#gender#
+		    ,fn_encrypt(#telno#)
+		    ,fn_encrypt(#email#)
+		    ,#disable_yn#
+		    ,#handicap#
+		    ,#part#
+		    ,#status#
+		    ,'Y'
+		    ,now()
+		    ,#reg_id#
+		    ,#ct_group#
+		    ,#option1#
+		    ,#option2#
+		    ,#option3#
+		    ,#option4#
+		    ,#option5#
+		    ,#option6#
+		    ,#zipcode#
+		    ,#addr#
+		    ,#addr_detail#
+		    ,#eng_first_name#
+		    ,#eng_last_name#
+			,'N'
+			,now()
+			,2
+			)
+		}
+	</procedure>
+	
+	
+	
+	<!-- 
+	<insert id="insertEventContestAppSecondTarget" parameterClass="ApageEventManageVo" >
+		INSERT INTO event_contest_app(
+             ct_seq, join_name, deposit_name, birth, gender,
+             telno, email, disable_yn, 
+             handicap, part, status, agree_yn, reg_dt, reg_id, ct_group
+             ,option1 ,option2 ,option3 ,option4 ,option5 ,option6
+             ,zipcode, addr, addr_detail, eng_first_name, eng_last_name
+           	<isNotEmpty property="ct_type">
+				<isEqual property="ct_type" compareValue="K" >
+					,app_sms_flag
+					,app_sms_date
+					,lane
+				</isEqual>
+			</isNotEmpty>
+			,reg_turn
+        )
+		VALUES(			
+		    #ct_seq#, #join_name#, #deposit_name#, #birth#, #gender#,
+		    fn_encrypt(#telno#), fn_encrypt(#email#), #disable_yn#, 
+		    #handicap#, #part#, #status#,'Y', now(), #reg_id# ,#ct_group#
+		    ,#option1# ,#option2# ,#option3# ,#option4# ,#option5# ,#option6#
+		    ,#zipcode#, #addr#, #addr_detail#, #eng_first_name#, #eng_last_name#
+           	<isNotEmpty property="ct_type">
+				<isEqual property="ct_type" compareValue="K" >
+					 ,'N'
+					,now()
+					,(	SELECT lane
+						FROM (
+							SELECT 
+								CONCAT(FLOOR(Q.group_start_num + (RAND() * (Q.group_end_num-Q.group_start_num))),'-',FLOOR(1 + (RAND() * (Q.lane_num)))) AS lane
+								,Q.ct_seq
+							FROM (
+								SELECT 
+									CASE WHEN prepare_yn = 'Y' THEN 3 ELSE 1 END AS group_start_num
+									,CASE WHEN prepare_yn = 'Y' THEN TRUNCATE((limit_part/lane_num),0)+2 ELSE TRUNCATE(limit_part/lane_num,0) END AS group_end_num
+									,limit_part
+									,lane_num
+									,ct_seq
+								FROM event_contest_manage
+								WHERE ct_seq = #ct_seq#
+							) Q
+						) Z
+						WHERE Z.lane NOT IN (
+							SELECT eca.lane
+							FROM event_contest_app eca
+							WHERE eca.ct_seq = Z.ct_seq
+							AND eca.part = #part#
+						)
+					)
+				</isEqual>
+			</isNotEmpty>
+		    ,#reg_turn#
+		 )		        
+	    <selectKey keyProperty="app_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	 -->
+	 
+	 
+	 <!-- 준비 및 진행 이벤트 대회 신청 리스트 -->
+	 <select id="apageSelectExpectEventContestList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT 
+			ct_seq
+			,ct_sbj
+			,ct_process
+			,ct_dt
+		FROM event_contest_manage
+		WHERE (ct_process = 'R' OR ct_process = 'S')
+		AND ct_type IN 
+			<iterate open="(" close=")" property="ct_type_arr" conjunction=",">
+			 	#ct_type_arr[]#
+			</iterate>   
+	</select>
+	
+	<!-- 접수제한 리스트 -->
+	<select id="apageSelectExpectEventContestGroupList" parameterClass="ApageEventManageVo" resultClass="ApageEventManageVo" >
+		SELECT 
+			ct_seq
+			,ct_sbj
+			,ct_process
+			,ct_dt
+		FROM event_contest_manage
+		WHERE CT_SEQ IN 
+			<iterate open="(" close=")" property="ct_seq_arr" conjunction=",">
+			 	#ct_seq_arr[]#
+			</iterate>   
+	</select>
+	
+	
+	
+	
+</sqlMap>

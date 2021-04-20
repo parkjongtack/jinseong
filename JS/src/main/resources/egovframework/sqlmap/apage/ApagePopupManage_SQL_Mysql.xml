@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ApagePopupManage">
+	<typeAlias  alias="apagePopupManageVo" type="egovframework.apage.system.service.apageSystemManageVo"/>
+	
+	<sql id="adminPopupBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					POP_SEQ
+					,POP_SUBJECT
+					,POP_WIDTH
+					,POP_HEIGHT
+					,POP_URL
+					,POP_ST_DT
+					,POP_ED_DT
+					,POP_CONTENT
+					,POP_STATE
+					,POP_SET
+					,POP_REG_NM
+					,POP_UP_NM
+					,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT 
+					,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT
+					,POP_POSITION_X
+					,POP_POSITION_Y  
+				FROM COMTNPOPUP
+				ORDER BY POP_SEQ DESC
+			)X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	<!-- 팝업 리스트 -->
+	<select id="selectadminPopupList" parameterClass="apagePopupManageVo" resultClass="apagePopupManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="adminPopupBase"/>
+				 	 WHERE 1=1
+				 	 <isNotEmpty property="scType">
+				 	 	<isEqual property="scType" compareValue="title" >
+							AND POP_SUBJECT  like concat('%',#srch_input#,'%')
+						</isEqual>
+				 	 	<isEqual property="scType" compareValue="url" >
+							AND POP_URL  like concat('%',#srch_input#,'%')
+						</isEqual>
+					 </isNotEmpty>
+					 <isEmpty property="scType">
+					 	<isNotEmpty property="srch_input">
+					 		AND (POP_SUBJECT  like concat('%',#srch_input#,'%') OR POP_URL  like concat('%',#srch_input#,'%'))
+					 	</isNotEmpty>
+					 </isEmpty>
+				) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 팝업 리스트 카운트 -->
+	<select id="selectadminPopupListCnt" parameterClass="apagePopupManageVo" resultClass="int" >
+		SELECT COUNT(*) CNT
+		FROM (
+			SELECT ROWNUM AS ASCNUM, Y.*
+			FROM(
+			 	 <include refid="adminPopupBase"/>
+			 	 WHERE 1=1
+			 	 <isNotEmpty property="scType">
+			 	 	<isEqual property="scType" compareValue="title" >
+						AND POP_SUBJECT  like concat('%',#srch_input#,'%')
+					</isEqual>
+					<isEqual property="scType" compareValue="url" >
+						AND POP_URL  like concat('%',#srch_input#,'%')
+					</isEqual>
+				</isNotEmpty>
+				<isEmpty property="scType">
+					<isNotEmpty property="srch_input">
+						AND (POP_SUBJECT  like concat('%',#srch_input#,'%') OR POP_URL  like concat('%',#srch_input#,'%'))
+					</isNotEmpty>
+				</isEmpty>
+			) Y
+		) Z
+	</select>
+	
+	<!-- 팝업 인서트 -->
+	<insert id="insertAdminPopup" parameterClass="apagePopupManageVo" >
+		 INSERT INTO COMTNPOPUP
+         	(
+         	 		POP_SUBJECT
+					,POP_WIDTH
+					,POP_HEIGHT
+					,POP_URL
+					,POP_ST_DT
+					,POP_ED_DT
+					,POP_CONTENT
+					,POP_STATE
+					,POP_SET
+					,POP_REG_NM
+					,POP_REG_DT									
+					,POP_POSITION_X
+					,POP_POSITION_Y
+             )
+         VALUES
+	         (
+	       			 #pop_subject#
+					, #pop_width#
+					, #pop_height#
+					, #pop_url#
+					, #pop_st_dt#
+					, #pop_ed_dt#
+					, #pop_content#
+					, #pop_state#
+					, #pop_set#
+					, #pop_reg_nm#					
+					, NOW()			
+					, #pop_position_x#
+					, #pop_position_y#
+	         )
+		<selectKey keyProperty="pop_seq" resultClass="int">
+        	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<!-- 팝업 상세 -->
+	<select id="getAdminPopupView" parameterClass="apagePopupManageVo" resultClass="apagePopupManageVo" >
+		SELECT
+		     POP_SEQ
+			,POP_SUBJECT
+			,POP_WIDTH
+			,POP_HEIGHT
+			,POP_URL
+			,POP_ST_DT
+			,POP_ED_DT
+			,POP_CONTENT
+			,POP_STATE
+			,POP_SET
+			,POP_REG_NM
+			,POP_UP_NM
+			,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT 
+			,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT
+			,POP_POSITION_X
+			,POP_POSITION_Y 
+		FROM COMTNPOPUP
+		WHERE POP_SEQ = #pop_seq#
+	</select>
+	
+	<!-- 팝업 삭제 -->
+	<delete id="adminPopupDelete" parameterClass="apagePopupManageVo">
+		DELETE 	FROM COMTNPOPUP
+		WHERE	POP_SEQ = #pop_seq#
+	</delete>
+	
+	<!-- 팝업 수정  -->
+	<update id="updateAdminPopup" parameterClass="apagePopupManageVo">
+		UPDATE COMTNPOPUP
+		SET  POP_SUBJECT	=	#pop_subject#
+			,POP_WIDTH		=	#pop_width#
+			,POP_HEIGHT		=	#pop_height#
+			,POP_URL		=	#pop_url#
+			,POP_ST_DT		=	#pop_st_dt#
+			,POP_ED_DT		=	#pop_ed_dt#
+			,POP_CONTENT	=	#pop_content#
+			,POP_STATE		=	#pop_state#
+			,POP_SET		=	#pop_set#
+			,POP_UP_NM		=	#pop_up_nm#
+			,POP_UP_DT		=	NOW()
+			,POP_POSITION_X	=	#pop_position_x#
+			,POP_POSITION_Y	=	#pop_position_y#
+		WHERE POP_SEQ = #pop_seq#
+	</update>
+	
+	<!-- 팝업 메인페이지 리스트 조건 추가 -->
+	<select id="selectClientPopupList" parameterClass="apagePopupManageVo" resultClass="apagePopupManageVo" >
+		SELECT
+		    Z.*
+		FROM (
+				SELECT ROWNUM AS ASCNUM, X.*
+				  FROM(
+				 	 <include refid="adminPopupBase"/>
+				 	 WHERE 1=1
+				  )X
+		     ) Z
+		WHERE Z.POP_STATE = 'Y'
+		AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN Z.POP_ST_DT AND Z.POP_ED_DT 
+	</select>
+	
+	
+	<!-- 팝업 체크박스 선택삭제-->
+	<delete id="adminPopupChkSelectDelete" parameterClass="apagePopupManageVo">
+		DELETE FROM COMTNPOPUP 	WHERE POP_SEQ = #pop_seq#
+	</delete>
+	
+</sqlMap>

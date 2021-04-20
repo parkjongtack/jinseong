@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="CmmnCode">
+	<typeAlias alias="CmmnCodeManageVo" type="egovframework.common.service.CmmnCodeManageVo" />
+
+	<!-- 공통코드그룹 리스트 -->
+	<select id="getCodeGroupList" parameterClass="string" resultClass="CmmnCodeManageVo" >
+		SELECT 
+				 CODE    
+				,CODE_NM                        
+		FROM 	TB_COM_CODE
+		WHERE	1 = 1 
+				AND CODE_USE_YN = 'Y'
+				AND GROUP_CD LIKE CONCAT('%',#group_cd#,'%')
+		ORDER BY 
+				COM_CODE_SEQ ASC
+	</select>
+</sqlMap>

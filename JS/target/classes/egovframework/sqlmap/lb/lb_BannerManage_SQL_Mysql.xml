@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="lb_BannerManage">
+	<typeAlias  alias="apageBannerManageVo" type="egovframework.apage.system.service.apageSystemManageVo"/>
+	
+	<sql id="lb_adminBannerBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					BAN_SEQ
+					,BAN_SUBJECT
+					,BAN_USE
+					,BAN_GUBUN
+					,BAN_URL
+					,BAN_CON
+					,BAN_REG_NM
+					,BAN_UP_NM
+					,ATCH_FILE_ID
+					,DATE_FORMAT(BAN_REG_DT, '%Y-%m-%d') AS BAN_REG_DT 
+					,DATE_FORMAT(BAN_UP_DT, '%Y-%m-%d') AS BAN_UP_DT 
+				FROM COMTBANNER
+                ORDER BY BAN_SEQ DESC 
+		)X,(SELECT @ROWNUM := 0) R
+	
+	</sql>
+	
+	<!-- 배너 리스트 -->
+	
+	<select id="lb_selectadminBannerList" parameterClass="apageBannerManageVo" resultClass="apageBannerManageVo" >
+			SELECT
+					BAN_SEQ
+					,BAN_SUBJECT
+					,BAN_USE
+					,BAN_GUBUN
+					,BAN_URL
+					,BAN_CON
+					,BAN_REG_NM
+					,BAN_UP_NM
+					,ATCH_FILE_ID
+					,DATE_FORMAT(BAN_REG_DT, '%Y-%m-%d') AS BAN_REG_DT 
+					,DATE_FORMAT(BAN_UP_DT, '%Y-%m-%d') AS BAN_UP_DT 
+			FROM COMTBANNER
+			WHERE 1=1
+			<isNotEmpty property="scType">
+				<isEqual property="scType" compareValue="Y" >
+					AND ban_use = 'Y'
+				</isEqual>
+				<isEqual property="scType" compareValue="N" >
+					AND ban_use = 'N'
+				</isEqual>
+			</isNotEmpty>
+			<isNotEmpty property="scType2">
+				<isEqual property="scType2" compareValue="title" >
+					AND BAN_SUBJECT like concat('%',#srch_input#,'%')
+				</isEqual>
+				<isEqual property="scType2" compareValue="link" >
+					AND BAN_URL like concat('%',#srch_input#,'%')
+				</isEqual>
+			</isNotEmpty>
+			ORDER BY BAN_SEQ DESC 
+			LIMIT 100
+	</select>
+	
+<!-- 	
+	<select id="lb_selectadminBannerList" parameterClass="apageBannerManageVo" resultClass="apageBannerManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="lb_adminBannerBase"/>
+				 	 WHERE 1=1
+				 	 <isNotEmpty property="scType">
+				 	 	<isEqual property="scType" compareValue="Y" >
+							AND ban_use = 'Y'
+						</isEqual>
+				 	 	<isEqual property="scType" compareValue="N" >
+							AND ban_use = 'N'
+						</isEqual>
+					 </isNotEmpty>
+				 	 <isNotEmpty property="scType2">
+				 	 	<isEqual property="scType2" compareValue="title" >
+				 	 		AND BAN_SUBJECT like concat('%',#srch_input#,'%')
+				 	 	</isEqual>
+				 	 	<isEqual property="scType2" compareValue="link" >
+				 	 		AND BAN_URL like concat('%',#srch_input#,'%')
+				 	 	</isEqual>
+				 	 </isNotEmpty>
+				) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	 -->
+	
+	
+	
+	
+	
+	
+</sqlMap>

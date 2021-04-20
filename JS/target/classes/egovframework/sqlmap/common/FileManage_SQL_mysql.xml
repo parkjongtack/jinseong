@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Common">
+	<typeAlias alias="FileManageVo" type="egovframework.common.service.FileManageVo"/>
+	
+	<!-- 
+	 파일 목록
+	<select id="getFileAttachList" parameterClass="FileManageVo" resultClass="FileManageVo" >
+		SELECT
+				FILE_ATTACH_SEQ
+				,PARENT_SEQ
+				,PARENT_NAME
+				,INPUT_NAME
+				,REAL_NAME
+				,FAKE_NAME
+				,FILE_ROUTE
+				,CONCAT(FILE_ROUTE,FAKE_NAME) AS FILE_ROUTE_FULL
+				,EXT_NAME
+				,FILE_SIZE
+				,DATE_FORMAT(REG_DT,'%Y-%m-%d') AS REG_DT
+		FROM 	tb_file_attach
+		WHERE	1 = 1
+				AND PARENT_NAME = #parent_name#
+				AND PARENT_SEQ = #parent_seq#
+				<isNotNull property="input_name">
+					AND INPUT_NAME = #input_name#
+				</isNotNull>				
+				
+				
+	</select>
+	
+	파일 상세
+	<select id="getFileAttachView" parameterClass="FileManageVo" resultClass="FileManageVo" >
+		SELECT
+				FILE_ATTACH_SEQ
+				,PARENT_SEQ
+				,PARENT_NAME
+				,INPUT_NAME
+				,REAL_NAME
+				,FAKE_NAME
+				,FILE_ROUTE
+				,CONCAT(FILE_ROUTE,FAKE_NAME) AS FILE_ROUTE_FULL
+				,EXT_NAME
+				,FILE_SIZE
+				,DATE_FORMAT(REG_DT,'%Y-%m-%d') AS REG_DT
+		FROM 	tb_file_attach
+		WHERE	1 = 1
+				AND FILE_ATTACH_SEQ = #file_attach_seq#
+	</select>
+	
+	파일 저장
+	<update id="setFileAttachInsert" parameterClass="FileManageVo">
+		INSERT INTO tb_file_attach(
+				PARENT_SEQ
+				,PARENT_NAME
+				,INPUT_NAME
+				,REAL_NAME
+				,FAKE_NAME
+				,FILE_ROUTE
+				,EXT_NAME
+				,FILE_SIZE
+				,REG_DT
+		)VALUES(
+				#parent_seq#
+				,#parent_name#
+				,#input_name#
+				,#real_name#
+				,#fake_name#
+				,#file_route#
+				,#ext_name#
+				,#file_size#
+				,NOW()
+		)	
+	</update>
+	
+		원하는 파일 목록
+	<select id="getNunFileAttachViewList" parameterClass="FileManageVo" resultClass="FileManageVo" >
+		SELECT
+				FILE_ATTACH_SEQ
+				,PARENT_SEQ
+				,PARENT_NAME
+				,INPUT_NAME
+				,REAL_NAME
+				,FAKE_NAME
+				,FILE_ROUTE
+				,CONCAT(FILE_ROUTE,FAKE_NAME) AS FILE_ROUTE_FULL
+				,EXT_NAME
+				,FILE_SIZE
+				,DATE_FORMAT(REG_DT,'%Y-%m-%d') AS REG_DT
+		FROM 	TB_FILE_ATTACH
+		WHERE	1 = 1
+				AND PARENT_SEQ = #parent_seq#
+				<isNotNull property="input_name">
+					AND  INPUT_NAME = #input_name#
+				</isNotNull>	
+	</select>
+	
+	파일 삭제
+	<delete id="setFileAttachDelete" parameterClass="FileManageVo">
+		DELETE
+		FROM 	tb_file_attach
+		WHERE 	FILE_ATTACH_SEQ = #file_attach_seq#
+	</delete>
+	
+		 리스트 삭제 후 첨부파일 정보 삭제
+	<delete id="setNunFileAttachDelete2" parameterClass="FileManageVo">
+		DELETE
+		FROM 	TB_FILE_ATTACH
+		WHERE 	PARENT_SEQ = #parent_seq#
+		<isNotNull property="input_name">
+			AND  INPUT_NAME = #input_name#
+		</isNotNull>	
+	</delete>
+ -->
+</sqlMap>
+
+
+
+
+
+

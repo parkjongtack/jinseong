@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+    "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<sqlMap resource="egovframework/sqlmap/lb/lb_Board_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/lb/lb_BannerManage_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/lb/lb_FileUploadManage_SQL_mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/lb/lb_Event_SQL_Mysql.xml"/>
+	
+	
+	<sqlMap resource="egovframework/sqlmap/lb/Apage_lb_Board_SQL_Mysql.xml"/>
+</sqlMapConfig>

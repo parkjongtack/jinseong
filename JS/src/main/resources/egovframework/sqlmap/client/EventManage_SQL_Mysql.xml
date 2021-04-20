@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="EventManage">
+	<typeAlias  alias="EventManageVo" type="egovframework.client.event.service.EventManageVo"/>
+	
+	<!-- 사용자 대회신청  -->
+	<insert id="insertEventContestApp" parameterClass="EventManageVo" >
+		INSERT INTO event_contest_app(
+             ct_seq, join_name, deposit_name, birth, gender,
+             telno, email, disable_yn, 
+             handicap, part, status, agree_yn, reg_dt, reg_id, ct_group
+             ,option1 ,option2 ,option3 ,option4 ,option5 ,option6
+             ,zipcode, addr, addr_detail, eng_first_name, eng_last_name
+           	<isNotEmpty property="ct_type">
+				<isEqual property="ct_type" compareValue="K" >
+					,app_sms_flag
+					,app_sms_date
+					,lane
+				</isEqual>
+			</isNotEmpty>
+			,reg_turn
+        )
+		VALUES(			
+		    #ct_seq#, #join_name#, #deposit_name#, #birth#, #gender#,
+		    fn_encrypt(#telno#), fn_encrypt(#email#), #disable_yn#, 
+		    #handicap#, #part#, #status#,'Y', now(), #reg_id# ,#ct_group#
+		    ,#option1# ,#option2# ,#option3# ,#option4# ,#option5# ,#option6#
+		    ,#zipcode#, #addr#, #addr_detail#, #eng_first_name#, #eng_last_name#
+           	<isNotEmpty property="ct_type">
+				<isEqual property="ct_type" compareValue="K" >
+					 ,'N'
+					,now()
+					,(	SELECT lane
+						FROM (
+							SELECT 
+								CONCAT(FLOOR(Q.group_start_num + (RAND() * (Q.group_end_num-Q.group_start_num))),'-',FLOOR(1 + (RAND() * (Q.lane_num)))) AS lane
+								,Q.ct_seq
+							FROM (
+								SELECT 
+									CASE WHEN prepare_yn = 'Y' THEN 3 ELSE 1 END AS group_start_num
+									,CASE WHEN prepare_yn = 'Y' THEN TRUNCATE((limit_part/lane_num),0)+2 ELSE TRUNCATE(limit_part/lane_num,0) END AS group_end_num
+									,limit_part
+									,lane_num
+									,ct_seq
+								FROM event_contest_manage
+								WHERE ct_seq = #ct_seq#
+							) Q
+						) Z
+						WHERE Z.lane NOT IN (
+							SELECT eca.lane
+							FROM event_contest_app eca
+							WHERE eca.ct_seq = Z.ct_seq
+							AND eca.part = #part#
+						)
+					)
+				</isEqual>
+			</isNotEmpty>
+		    ,1
+		 )		        
+	    <selectKey keyProperty="app_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	
+	<!-- 이벤트 대회 신청 플래그변경 -->
+	<update id="updateEventContestManageFlag" parameterClass="EventManageVo">
+		UPDATE event_contest_manage
+		SET
+			ct_process = #ct_process#
+			,updt_dt = NOW() 
+			<isNotEmpty property="ct_type">
+				<isEqual property="ct_type" compareValue="K" >
+					,ct_sms_send_dt = now()
+					,result_sms_send_yn = 'Y'
+				</isEqual>
+			</isNotEmpty>
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+	<!-- 마이페이지 이벤트 대회 신청정보 수정 -->
+	<update id="cpageUpdateMyEventContestAppInfo"  parameterClass="EventManageVo" >
+		UPDATE event_contest_app SET
+			 telno = fn_encrypt(#telno#)
+			 ,eng_last_name = #eng_last_name#
+			 ,eng_first_name = #eng_first_name#
+			 ,zipcode = #zipcode#
+			 ,addr = #addr#
+			 ,addr_detail = #addr_detail#
+			 ,option1 = #option1#
+			 ,option2 = #option2#
+			 ,option3 = #option3#
+			 ,option4 = #option4#
+			 ,option5 = #option5#
+			 ,option6 = #option6#
+			,email = fn_encrypt(#email#) 
+			,handicap = #handicap#
+			,disable_yn = #disable_yn#
+			,refund_bank = #refund_bank#
+			,refund_accholder = #refund_accholder#
+			,refund_account = #refund_account#
+		WHERE APP_SEQ = #app_seq#
+	</update>
+	
+	<!-- 이벤트 대회 신청 취소 -->
+	<update id="cancelMyEventContest" parameterClass="EventManageVo">
+		UPDATE event_contest_app
+		SET
+			part = #part#
+			,lane = ''
+			,status = '0003'
+			,updt_dt = NOW() 
+			,updt_id = #updt_id#
+			,refund_bank = #refund_bank#
+			,refund_accholder = #refund_accholder#
+			,refund_account = #refund_account#
+			,ct_group = CONCAT(ct_group,'_',app_seq)
+			,cancel_date = NOW()
+		WHERE app_seq = #app_seq#
+	</update>
+	
+	
+	<!-- 마이페이지 - 이벤트 대회 선정된 사람이 대회신청 취소할 경우, 추출한 대기자 넣기 -->
+	<update id="updateEventContstNewMember" parameterClass="EventManageVo">
+		UPDATE event_contest_app
+		SET
+			part = #part#,
+			lane = #lane#,
+			STATUS = '0004',
+			waiting_num = 0,
+			updt_dt = NOW(), 
+			updt_id = #updt_id#
+		WHERE app_seq = #app_seq#
+	</update>
+	
+	
+	<!-- 이벤트 대회 대기자 재정렬 -->
+	<update id="eventContestAppResultOrderStatusChange" parameterClass="EventManageVo">
+		UPDATE event_contest_app capp,(
+			SELECT *
+			FROM (
+				SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+				FROM (
+					SELECT 
+						 ca.app_seq
+						,ca.ct_seq
+						,ca.status
+						,ca.reg_dt
+						,ca.join_name
+						,ca.reg_id
+						,part
+						,ca.waiting_num
+						,cm.limit_part
+						,cm.limit_waiting
+						,(cm.limit_part+cm.limit_waiting) AS total_limit
+					FROM event_contest_app ca
+					JOIN event_contest_manage cm
+					WHERE ca.ct_seq = cm.ct_seq
+					AND ca.status = '0005'
+					AND ca.ct_seq = #ct_seq#
+					AND ca.part = #part#
+					ORDER BY ca.waiting_num ASC
+				)X,(SELECT @ROWNUM := 0) R
+			) Q
+		) uapp
+	
+		SET 
+			 capp.waiting_num = uapp.rownum
+		WHERE capp.app_seq = uapp.app_seq
+		AND capp.reg_id = uapp.reg_id
+		AND capp.ct_seq = uapp.ct_seq
+	</update>
+	
+	
+	
+	
+	
+	
+	<!-- 사용자 대회신청  -->
+	<procedure id="insertEventContestApp_procedure" parameterClass="EventManageVo">
+    	{ CALL pc_event_contest_app_kok(
+    		#ct_seq# 
+    		,#join_name#
+    		,#deposit_name#
+    		,#birth#
+    		,#gender#
+		    ,fn_encrypt(#telno#)
+		    ,fn_encrypt(#email#)
+		    ,#disable_yn#
+		    ,#handicap#
+		    ,#part#
+		    ,#status#
+		    ,'Y'
+		    ,now()
+		    ,#reg_id#
+		    ,#ct_group#
+		    ,#option1#
+		    ,#option2#
+		    ,#option3#
+		    ,#option4#
+		    ,#option5#
+		    ,#option6#
+		    ,#zipcode#
+		    ,#addr#
+		    ,#addr_detail#
+		    ,#eng_first_name#
+		    ,#eng_last_name#
+			,'N'
+			,now()
+			,1
+			)
+		}
+	</procedure>
+	
+	
+	
+	
+</sqlMap>

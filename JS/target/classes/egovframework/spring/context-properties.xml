@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean name="propertiesService" class="egovframework.rte.fdl.property.impl.EgovPropertyServiceImpl" destroy-method="destroy">
+		<property name="properties">
+	        <map>
+	        	<entry key="pageUnit" value="10"/>
+	        	<entry key="pageSize" value="10"/>
+	        	<!-- 
+	        	<entry key="Globals.fileStorePath" value="/mnt/nas/bowlingkorea/file_upload"/> 
+				 -->
+				 <entry key="Globals.fileStorePath" value="D:\\project\\jinseong\\JS\\src\\main\\resources\\mnt\\nas\\bowlingkorea\\file_upload"/> 
+			<!--	        	
+			<entry key="Globals.fileStorePathEdit" value="/home/bowlingkorea/www"/>
+			-->
+			<entry key="Globals.fileStorePathEdit" value="D:\\project\\jinseong\\JS\\src\\main\\resources\\mnt\\nas\\bowlingkorea\\file_upload"/>
+			<!--
+			<entry key="Globals.fileStorePathEdit" value="/mnt/nas/bowlingkorea/file_upload"/> 
+ 			-->	   
+	        	<!--
+	        	<entry key="Globals.contestAccessLogPath" value="/mnt/nas/bowlingkorea/logs"/>
+	 			-->	   
+	 			<entry key="Globals.contestAccessLogPath" value="D:\\project\\jinseong\\JS\\src\\main\\resources\\mnt\\nas\\bowlingkorea\\logs"/>
+       	        	<entry key="Globals.jwtTokenKey" value="signisjinseung"/>	
+	        </map>
+		</property>
+	</bean>
+	
+</beans>	

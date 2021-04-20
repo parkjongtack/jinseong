@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ShopManage">
+	<typeAlias  alias="ShopManageVo" type="egovframework.client.shop.service.ShopManageVo"/>
+	
+	<!-- 게시판 베이스 -->
+	<sql id="ShopBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+				  no, hash, code, prd_type, name, seller, seller_idx, origin_name, stat, sell_prc, m_sell_prc,
+				  weight, normal_prc, m_normal_prc, milage, origin_prc, updir, upfile1, upfile2, upfile3,
+				  content1, content2, content3, content4, content5, fieldset, icons,
+				  ref_prd, reg_date, edt_date, big, mid, small, depth4, mbig, xbig, xmid, qna_cnt, hit_view,
+				  hit_order, hit_sales, sortbig, sortmid, sortsmall, sortdepth4, ep_stat, hs_code, name_referer,
+				  del_stat, del_date, del_admin  
+				FROM bowlingshop.wm_product
+				where del_stat = 1
+				and hash not in ('757F843A169CC678064D9530D12A1881')
+				AND big = #big#
+			 	<isNotEmpty property="big">
+			 		<isNotEqual property="big" compareValue="1001">
+				 		<isNotEqual property="big" compareValue="1102">
+							AND stat != '4'
+				 		</isNotEqual>
+			 		</isNotEqual>
+				</isNotEmpty>
+				<isEmpty property="big">
+						AND stat != '4'
+				</isEmpty>
+			 	<isNotEmpty property="mid">
+					<isNotEmpty property="mid">
+				 		AND mid = #mid#
+				 	</isNotEmpty>
+				</isNotEmpty>
+				<isNotEmpty property="small">
+				 	<isNotEmpty property="small">
+				 		AND small = #small#
+				 	</isNotEmpty>
+				</isNotEmpty>
+				<isNotEmpty property="depth4">
+				 	<isNotEmpty property="depth4">
+				 		AND depth4 = #depth4#
+				 	</isNotEmpty>
+				</isNotEmpty>
+				<isEmpty property="scType">
+				 	<isNotEmpty property="srch_input">
+				 		AND name like concat('%',#srch_input#,'%')
+				 	</isNotEmpty>
+				</isEmpty>	
+		)X,(SELECT @ROWNUM := 0) R	
+	</sql>
+	
+	
+	<!-- 상품 리스트 -->
+	<select id="selectShopList" parameterClass="ShopManageVo" resultClass="ShopManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="ShopBase"/>
+				 	 WHERE 1 = 1				 
+					 ORDER BY reg_date DESC
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 상품 리스트 카운트 -->
+	<select id="selectShopListCnt" parameterClass="ShopManageVo" resultClass="int" >
+		SELECT
+		    COUNT(*) CNT
+		FROM (
+				 SELECT ROWNUM AS ASCNUM, Y.*
+				 FROM(
+					 <include refid="ShopBase"/>
+	 				 WHERE 1 = 1
+					) Y
+	 			) Z
+	</select>
+	
+	<!-- 상품 상세정보 -->
+	<select id="selectShopView" parameterClass="ShopManageVo" resultClass="ShopManageVo" >
+		SELECT
+			a.no, a.hash, a.code, a.prd_type, a.name, a.seller, a.seller_idx, a.origin_name, a.stat, a.sell_prc, a.m_sell_prc,
+			a.weight, a.normal_prc, a.m_normal_prc, a.milage, a.origin_prc, a.updir, a.upfile1, a.upfile2, a.upfile3,
+			a.content1, a.content2, a.content3, a.content4, a.content5, a.fieldset, a.icons,
+			a.ref_prd, a.reg_date, a.edt_date, a.big, a.mid, a.small, a.depth4, a.mbig, a.xbig, a.xmid, a.qna_cnt, a.hit_view,
+			a.hit_order, a.hit_sales, a.sortbig, a.sortmid, a.sortsmall, a.sortdepth4, a.ep_stat, a.hs_code, a.name_referer,
+			a.del_stat, a.del_date, a.del_admin,
+			b.value,
+			c.content, DATE_FORMAT(c.reg_date, '%Y-%m-%d') AS reg_date, DATE_FORMAT(c.edt_date, '%Y-%m-%d') AS edt_date 
+		FROM wm_product AS a
+		LEFT JOIN wm_product_filed AS b
+		ON a.no = b.pno
+		LEFT JOIN wm_product_ad_image AS c
+		ON a.hash = c.hash
+		WHERE a.hash = #hash#
+		<!-- 
+		AND a.stat != '4'
+		 -->
+		GROUP BY a.hash
+	</select>
+	
+	<!-- 상품 상세정보_광고_등록 -->
+	<insert id="insertShopADImage" parameterClass="ShopManageVo">
+		INSERT INTO wm_product_ad_image
+			(
+				 hash
+				,content
+				,reg_date
+             )
+         VALUES
+	         (
+				 #hash#
+				,#content#
+				,now()
+	         )
+	    <selectKey keyProperty="no" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<!-- 상품 상세정보_광고_수정 -->
+	<update id="updateShopADImage" parameterClass="ShopManageVo">
+		UPDATE wm_product_ad_image
+		SET 
+			<isNotEmpty property="content">
+			content	=	#content#
+			</isNotEmpty>
+			,edt_date = now()
+		WHERE hash = #hash#
+	</update>
+	
+	<!-- 상품 상세정보(옵션) -->
+	<select id="selectShopOptionsView" parameterClass="ShopManageVo" resultClass="ShopManageVo" >
+		SELECT
+			b.name, REPLACE(b.items,'@',',') as items
+		FROM wm_product AS a
+		JOIN wm_product_option_set AS b
+		ON a.no = b.pno
+		WHERE a.hash = #hash#
+	</select>
+	
+	<!-- 상품 첨부이미지 정보 -->
+	<select id="selectShopViewImg" parameterClass="ShopManageVo" resultClass="ShopManageVo" >
+		SELECT NO, pno, updir, filename, ofilename, width, height, sort
+		FROM wm_product_image
+		WHERE pno = #pno#
+	</select>
+	
+	<!-- 메인페이지 - 볼링볼 및 용품(new -> ebig = 1015 기준) -->
+	<select id="selectShopListNew" resultClass="ShopManageVo" >
+	<!-- 
+		SELECT 
+			a.name,
+			a.hash,
+			a.big,
+			a.mid,
+			a.updir,
+			a.upfile3,
+			a.reg_date,
+			b.value
+		FROM wm_product AS a
+		JOIN (SELECT pno,VALUE FROM wm_product_filed GROUP BY pno) AS b
+		ON a.no = b.pno
+		WHERE a.del_stat = 1 AND a.stat = 2 AND a.ebig like '%1015%'
+		ORDER BY a.reg_date DESC
+	 -->
+		 SELECT 
+			a.name,
+			a.hash,
+			a.big,
+			a.mid,
+			a.updir,
+			a.upfile3,
+			a.reg_date,
+			b.value,
+			c.name AS options,
+			REPLACE(c.items,'@',',') AS items
+			<!-- d.value AS c_name -->
+		FROM wm_product AS a
+		LEFT JOIN (SELECT pno,VALUE FROM wm_product_filed GROUP BY pno) AS b
+		ON a.no = b.pno
+		LEFT JOIN (SELECT pno, REPLACE(items,'@',',') AS items, NAME FROM wm_product_option_set GROUP BY pno) AS c
+		ON a.no = c.pno
+		<!-- 
+		LEFT JOIN (SELECT PNO,VALUE FROM wm_product_filed GROUP BY pno ) AS  d
+		ON a.no = d.pno
+		 -->
+		WHERE a.del_stat = 1 AND a.stat = 2
+		AND (a.ebig LIKE '%1015%' OR a.ebig LIKE '%1009%')
+		ORDER BY a.reg_date DESC
+		LIMIT 10
+	</select>
+	
+	<!-- 메인페이지 - 볼링볼 및 용품(new -> ebig = 1015 기준) 옵션 -->
+	<select id="selectShopListNewOptions" resultClass="ShopManageVo" >
+		SELECT
+			a.hash,
+			b.value,
+			c.name,
+			REPLACE(c.items,'@',',') as items
+		FROM wm_product AS a
+		LEFT JOIN wm_product_filed AS b
+		ON a.no = b.pno
+		LEFT JOIN wm_product_option_set AS c
+		ON a.no = c.pno
+		WHERE a.del_stat = 1 AND a.stat = 2 AND a.ebig LIKE '%1015%' 
+		ORDER BY a.reg_date DESC
+	</select>
+	
+	<!-- 메인페이지 - 볼링볼 및 용품(hot -> ebig = 1016 기준) -->
+	<select id="selectShopListHot" resultClass="ShopManageVo" >
+		<!-- 
+		SELECT 
+			name,
+			hash,
+			big,
+			mid,
+			updir,
+			upfile3,
+			hit_order 
+		FROM wm_product
+		WHERE del_stat = 1 AND stat = 2 AND ebig like '%1016%'
+		ORDER BY hit_order DESC
+		 -->
+		 SELECT 
+			a.NAME,
+			a.HASH,
+			a.big,
+			a.MID,
+			a.updir,
+			a.upfile3,
+			a.hit_order,
+			a.hash,
+			b.value,
+			c.name AS OPTIONS,
+			REPLACE(c.items,'@',',') AS items
+		FROM wm_product AS a
+		LEFT JOIN wm_product_filed AS b
+		ON a.no = b.pno
+		LEFT JOIN wm_product_option_set AS c
+		ON a.no = c.pno
+		WHERE a.del_stat = 1 AND a.stat = 2 AND ebig LIKE '%1016%'
+		ORDER BY a.reg_date DESC
+		LIMIT 10
+		
+	</select>
+	
+	<!-- 메인페이지 - 볼링볼 및 용품(hot -> ebig = 1016 기준) 옵션 -->
+	<select id="selectShopListHotOptions" resultClass="ShopManageVo" >
+		SELECT 
+			a.hash,
+			b.value,
+			c.name,
+			REPLACE(c.items,'@',',') as items
+		FROM wm_product AS a
+		JOIN wm_product_filed AS b
+		ON a.no = b.pno
+		LEFT JOIN wm_product_option_set AS c
+		ON a.no = c.pno
+		WHERE a.del_stat = 1 AND a.stat = 2 AND ebig like '%1016%'
+		ORDER BY a.hit_order DESC
+	</select>
+
+</sqlMap>

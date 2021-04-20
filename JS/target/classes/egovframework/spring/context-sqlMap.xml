@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd 
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd			
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+
+	<bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true" />
+	<bean id="lobHandlerShop" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true" />
+	<bean id="lobHandler_sms" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true" />
+	<bean id="lobHandler_lb" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true" />
+
+	<!-- SqlMap setup for iBATIS Database Layer -->
+	
+	<!-- gp -->
+	<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocations">
+			<list>
+				<value>classpath:/egovframework/sqlmap/config/mysql/*.xml</value>
+			</list>
+		</property>
+		
+		<property name="lobHandler" ref="lobHandler"/>
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	
+	<bean id="sqlMapClientShop" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocations">
+			<list>
+				<value>classpath:/egovframework/sqlmap/config/shop/*.xml</value>
+			</list>
+		</property>
+		
+		<property name="lobHandler" ref="lobHandlerShop"/>
+		<property name="dataSource" ref="dataSourceShop"/>
+	</bean>
+	
+	<bean id="sqlMapClient_sms" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocations">
+			<list>
+				<value>classpath:/egovframework/sqlmap/config/sms/*.xml</value>
+			</list>
+		</property>
+		
+		<property name="lobHandler" ref="lobHandler_sms"/>
+		<property name="dataSource" ref="dataSource_sms"/>
+	</bean>
+
+	<bean id="sqlMapClient_lb" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocations">
+			<list>
+				<value>classpath:/egovframework/sqlmap/config/lb/*.xml</value>
+			</list>
+		</property>
+		
+		<property name="lobHandler" ref="lobHandler_lb"/>
+		<property name="dataSource" ref="dataSource_lb"/>
+	</bean>
+</beans>	

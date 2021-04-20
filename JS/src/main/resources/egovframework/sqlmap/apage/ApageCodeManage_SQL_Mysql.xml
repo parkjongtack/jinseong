@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ApageCodeManage">
+	<typeAlias  alias="apageCodeManageVo" type="egovframework.apage.system.service.apageSystemManageVo"/>
+	
+	<sql id="adminCodeBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+							B.CL_CODE
+						  , B.CODE_ID_SEQ
+						  , B.CODE_ID_NM
+						  , B.USE_YN
+						  , B.REG_NM
+						  ,DATE_FORMAT(B.REG_DT, '%Y-%m-%d') AS REG_DT
+						  , C.CL_CODE_NM
+						FROM COMTCODE B
+						LEFT OUTER JOIN COMTCLCODE C 
+							ON B.CL_CODE = C.CL_CODE
+						WHERE 1=1
+					 	<isNotEmpty property="srch_input">
+							AND CODE_ID_NM like concat('%',#srch_input#,'%')
+						</isNotEmpty>
+                  		ORDER BY B.CODE_ID_SEQ  DESC 
+		)X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	<!-- 공통코드 리스트 -->
+	<select id="selectadminCodeList" parameterClass="apageCodeManageVo" resultClass="apageCodeManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="adminCodeBase"/>
+					) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 공통코드 리스트 카운트 -->
+	<select id="selectadminCodeListCnt" parameterClass="apageCodeManageVo" resultClass="int" >
+		SELECT COUNT(*) CNT
+		FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 					<include refid="adminCodeBase"/>
+				) Y
+		   ) Z
+	</select>
+	
+	<!-- 분류명 중복체크 -->
+	<select id="getcodeNameChk" parameterClass="apageCodeManageVo" resultClass="int" >
+		SELECT 
+  			COUNT(*) CNT 
+		FROM	COMTCLCODE
+		WHERE 	CL_CODE_NM	=	#cl_code_nm#
+	</select>
+	
+	<!-- 분류명 등록 -->
+	<insert id="setcodeNameReg" parameterClass="apageCodeManageVo" >
+		INSERT INTO COMTCLCODE (CL_CODE, CL_CODE_NM, REG_NM, REG_DT)
+		SELECT
+			CONCAT(#code_gb#,NEXT_SEQ) AS CL_CODE , #cl_code_nm#, #reg_nm#, NOW()
+		FROM
+		(SELECT
+			LPAD(IFNULL(MAX(SUBSTR(CL_CODE, 2, 4)), 0) + 1,4,0) AS NEXT_SEQ
+		FROM COMTCLCODE
+		WHERE CL_CODE LIKE CONCAT(#code_gb#,'%')
+		) A 
+	</insert>
+	
+	<!-- 분류명 리스트 -->
+	<select id="getCLCodeList" parameterClass="apageCodeManageVo" resultClass="apageCodeManageVo" >
+		SELECT 
+			 CL_CODE
+			,CL_CODE_NM
+		FROM COMTCLCODE 
+		
+	</select>
+	
+	<!-- 코드명 인서트 -->
+	<insert id="insertAdminCode" parameterClass="apageCodeManageVo" >
+		 INSERT INTO COMTCODE(CODE_ID_SEQ, CL_CODE, CODE_ID_NM, USE_YN, REG_NM, REG_DT)
+		 SELECT
+			NEXT_SEQ AS CODE_ID_SEQ , #cl_code#, #code_id_nm#, #use_yn#, #reg_nm#, NOW()
+		FROM
+		(SELECT
+			LPAD(IFNULL(MAX(SUBSTR(CODE_ID_SEQ, 4, 3)), 0) + 1,6,0) AS NEXT_SEQ
+		FROM COMTCODE
+		) A
+	</insert>
+	
+	<!-- 코드 상세 -->
+	<select id="getCodeView" parameterClass="apageCodeManageVo" resultClass="apageCodeManageVo" >
+		SELECT 
+			B.CL_CODE
+		  , B.CODE_ID_SEQ
+		  , B.CODE_ID_NM
+		  , B.USE_YN
+		  , B.REG_NM
+		  ,DATE_FORMAT(B.REG_DT, '%Y-%m-%d') AS REG_DT 
+		  , C.CL_CODE_NM
+		FROM COMTCODE B 
+			LEFT OUTER JOIN COMTCLCODE C 
+				ON B.CL_CODE = C.CL_CODE 
+		WHERE B.CODE_ID_SEQ = #code_id_seq# 
+	</select>
+	
+	<!-- 코드 수정 -->
+	<update id="setCodeUpdate" parameterClass="apageCodeManageVo" >
+		UPDATE	COMTCODE 
+		SET		  CL_CODE   	= #cl_code#
+				, CODE_ID_NM 	= #code_id_nm#
+				, USE_YN		= #use_yn#
+				, REG_NM		= #reg_nm#
+				, CODE_ID_SEQ   = #code_id_seq2#
+		WHERE	CODE_ID_SEQ 	= #code_id_seq# 
+	</update>
+	
+	<!-- 코드 삭제 -->
+	<delete id="setCodeDelete" parameterClass="apageCodeManageVo">
+		DELETE 	FROM COMTCODE
+		WHERE	CODE_ID_SEQ 	= #code_id_seq# 
+	</delete>
+	
+	<!-- 각 코드 리스트 -->
+	<select id="getCodeNameList" parameterClass="apageCodeManageVo" resultClass="apageCodeManageVo" >
+		SELECT 
+			IFNULL(CODE_ID_SEQ,'0') AS CODE_ID_SEQ
+			, CODE_ID_NM 
+		FROM COMTCODE
+		WHERE CL_CODE = #cl_code#
+		ORDER BY CODE_ID_SEQ ASC
+	</select>
+	
+	<!-- 코드중복체크 -->
+	<select id="codeSeqChk" parameterClass="apageCodeManageVo" resultClass="int" >
+		SELECT COUNT(*) CNT 
+		FROM COMTCODE
+		WHERE CODE_ID_SEQ 	= #code_id_seq#
+	</select>
+	
+	
+</sqlMap>

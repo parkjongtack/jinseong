@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SmsManage">
+	<typeAlias  alias="SmsManageVo" type="egovframework.common.service.SmsManageVo"/>
+	
+	<!-- SMS베이스 -->
+	<sql id="smsbase">
+	SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					 A.TR_NUM
+					,A.TR_SENDDATE
+					,A.TR_SERIALNUM
+					,A.TR_ID
+					,A.TR_SENDSTAT						
+					,A.TR_RSLTSTAT
+					,A.TR_MSGTYPE
+					,A.TR_PHONE
+					,A.TR_CALLBACK
+					,A.TR_ORG_CALLBACK
+					,A.TR_BILL_ID
+					,A.TR_RSLTDATE
+					,A.TR_MODIFIED
+					,A.TR_MSG
+					,A.TR_NET
+					,A.TR_REALSENDDATE					
+				FROM SMS_MSG A
+			 )X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	<!-- 발송 SMS 리스트 -->
+	<select id="selectSmsList" parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		SELECT
+				Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+					<include refid="smsbase"/>
+				 	WHERE 1 = 1
+					<isEmpty property="scType">
+						<isNotEmpty property="srch_input">
+					 		AND TR_MSG like concat('%',#srch_input#,'%')
+						</isNotEmpty>
+					</isEmpty>
+					<isNotEmpty property="srch_date">
+						AND TR_SENDDATE <![CDATA[>=]]> #srch_date#
+					</isNotEmpty>
+					<isNotEmpty property="srch_date2">
+					 	AND TR_SENDDATE <![CDATA[<=]]> #srch_date2#
+					</isNotEmpty>
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 발송 SMS 리스트 카운트 -->
+	<select id="selectSmsListCnt" parameterClass="SmsManageVo" resultClass="int">
+		SELECT
+				COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 				<include refid="smsbase"/>
+ 				WHERE 1 = 1
+ 				<isEmpty property="scType">
+					<isNotEmpty property="srch_input">
+				 		AND TR_MSG like concat('%',#srch_input#,'%')
+					</isNotEmpty>
+				</isEmpty>
+				<isNotEmpty property="srch_date">
+					AND TR_SENDDATE <![CDATA[>=]]> #srch_date#
+				</isNotEmpty>
+				<isNotEmpty property="srch_date2">
+				 	AND TR_SENDDATE <![CDATA[<=]]> #srch_date2#
+				</isNotEmpty>
+			) Y
+		) Z
+	</select>
+	
+	<!-- SMS 발송 -->
+	<insert id="insertSmsList" parameterClass="SmsManageVo">
+		INSERT INTO SMS_MSG
+         	(
+				 TR_SENDDATE
+				,TR_SENDSTAT
+				,TR_MSGTYPE
+				,TR_PHONE
+				,TR_CALLBACK
+				,TR_MSG
+				,TR_ORG_CALLBACK
+				,TR_ETC1
+				,TR_ETC2
+				,TR_ETC3
+				,TR_ETC4
+				,TR_ETC5
+				,TR_ETC6
+				,TR_ETC7
+				,TR_ETC8
+				,TR_ETC9
+				,TR_ETC10
+             )
+         VALUES
+	         (
+				 NOW()
+				,'0'
+				,'0'
+				,#tr_phone#
+				,'031-769-8433'
+				,#tr_msg#
+				,'031-769-8433'
+				,#tr_etc1#
+				,#tr_etc2#
+				,#tr_etc3#
+				,#tr_etc4#
+				,#tr_etc5#
+				,#tr_etc6#
+				,#tr_etc7#
+				,#tr_etc8#
+				,#tr_etc9#
+				,#tr_etc10#
+	         )
+	    <selectKey keyProperty="tr_num" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	
+	<!-- MMS 발송 -->
+	<insert id="insertMmsList" parameterClass="SmsManageVo">
+		INSERT INTO MMS_MSG(
+			  SUBJECT
+			, PHONE
+			, CALLBACK
+			, STATUS
+			, REQDATE
+			, MSG
+			, TYPE
+			, ORG_CALLBACK
+			, ETC1
+			, ETC2
+			, ETC3
+			, ETC5
+			, ETC6
+			, ETC7
+			, ETC8
+			, ETC9
+			, ETC10
+		)
+		VALUES(
+			  #subject#
+			, #phone#
+			, '031-769-8433'
+			, '0'
+			, NOW()
+			, #msg#
+			, '0'
+			, '031-769-8433'
+			, #etc1#
+			, #etc2#
+			, #etc3#
+			, #etc5#
+			, #etc6#
+			, #etc7#
+			, #etc8#
+			, #etc9#
+			, #etc10#
+		);
+	    <selectKey keyProperty="msgkey" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	
+	<!-- //MMS LOG LIST -->
+	<select id="selectSmsLogList" parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		SELECT 
+				 MSGKEY
+				,SUBJECT
+				,PHONE
+				,CALLBACK
+				,ORG_CALLBACK
+				,BILL_ID
+				,STATUS
+				,REQDATE
+				,MSG
+				,EXPIRETIME
+				,SENTDATE
+				,RSLTDATE
+				,REPORTDATE
+				,TERMINATEDDATE
+				,IFNULL(RSLT,2) as RSLT
+				,IFNULL(REPCNT,0) as REPCNT
+				,TYPE
+				,TELCOINFO
+				,ID
+				,POST
+				,ETC1
+				,ETC2
+				,ETC3
+				,ETC4
+				,ETC5
+				,ETC6
+				,ETC7
+				,ETC8
+				,ETC9
+				,ETC10
+		FROM $log_table_name$
+		WHERE ETC1 = #etc1#
+		AND ETC2 = #etc2#
+		AND ETC5 = #etc5#
+	</select>
+	
+	<!-- //MMS LOG LIST - SMS관리에서 발송 -->
+	<select id="selectSmsLogListAboutGeneralAndExcel" parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		SELECT 
+				 MSGKEY
+				,SUBJECT
+				,PHONE
+				,CALLBACK
+				,ORG_CALLBACK
+				,BILL_ID
+				,STATUS
+				,REQDATE
+				,MSG
+				,EXPIRETIME
+				,SENTDATE
+				,RSLTDATE
+				,REPORTDATE
+				,TERMINATEDDATE
+				,RSLT
+				,IFNULL(REPCNT,0) as REPCNT
+				,TYPE
+				,TELCOINFO
+				,ID
+				,POST
+				,ETC1
+				,ETC2
+				,ETC3
+				,ETC4
+				,ETC5
+				,ETC6
+				,ETC7
+				,ETC8
+				,ETC9
+				,ETC10
+		FROM $log_table_name$
+		WHERE ETC3 = #etc3#
+	</select>
+	
+	
+	
+	<!-- //MMS LOG 테이블 LIST-->
+	<select id="getMmsLogTableList" parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		<![CDATA[
+			SELECT TABLE_NAME 
+			FROM INFORMATION_SCHEMA.TABLES 
+			WHERE TABLE_SCHEMA = 'jssms'
+			AND table_name LIKE '%mms_log%'
+			AND DATE_FORMAT(STR_TO_DATE(CONCAT(SUBSTR(table_name,9,4),'-',SUBSTR(table_name,13,2)),'%Y-%m'),'%Y-%m') >= DATE_FORMAT(STR_TO_DATE(#beforeMonth#,'%Y-%m'),'%Y-%m')
+			AND DATE_FORMAT(STR_TO_DATE(CONCAT(SUBSTR(table_name,9,4),'-',SUBSTR(table_name,13,2)),'%Y-%m'),'%Y-%m') <= DATE_FORMAT(STR_TO_DATE(#afterMonth#,'%Y-%m'),'%Y-%m')
+		]]>
+	</select>
+	
+	<!-- MMS LOG Table 발송내역 UNION 리스트 -->
+	<select id="getMmsLogTableUnionList" parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		SELECT X.*
+		FROM (
+			<iterate property="log_tables" conjunction="UNION">
+			 	SELECT 
+					 MSGKEY
+					,SUBJECT
+					,PHONE
+					,CALLBACK
+					,ORG_CALLBACK
+					,BILL_ID
+					,STATUS
+					,REQDATE
+					,DATE_FORMAT(REQDATE, '%Y%m') AS REQDATE_YM
+					,MSG
+					,EXPIRETIME
+					,SENTDATE
+					,RSLTDATE
+					,REPORTDATE
+					,TERMINATEDDATE
+					,RSLT
+					,IFNULL(REPCNT , 0) as REPCNT
+					,TYPE
+					,TELCOINFO
+					,ID
+					,POST
+					,ETC1
+					,ETC2
+					,ETC3
+					,IFNULL(ETC4 , 0) AS ETC4
+					,ETC5
+					,ETC6
+					,ETC7
+					,ETC8
+					,IFNULL(ETC9 , 0) AS ETC9
+					,ETC10
+				FROM  $log_tables[]$
+				WHERE 1=1
+				<isNotEmpty property="etc1">
+					AND ETC1 = #etc1#
+				</isNotEmpty>
+				<isNotEmpty property="etc2">
+					AND ETC2 = #etc2#
+				</isNotEmpty>
+				<isNotEmpty property="etc3">
+					AND ETC3 = #etc3#
+				</isNotEmpty>
+				<isNotEmpty property="etc5">
+					<isEqual property="etc5" compareValue="all" >
+						AND (ETC5 = #etc5# OR ETC5 = 'auto' OR ETC5 IS NULL)
+					</isEqual>
+					<isEqual property="etc5" compareValue="lane" >
+						AND ETC5 = #etc5#
+					</isEqual>
+					<isEqual property="etc5" compareValue="normal" >
+						AND ETC5 = #etc5#
+					</isEqual>
+					<isEqual property="etc5" compareValue="excelMember" >
+						AND ETC5 = #etc5#
+					</isEqual>
+				</isNotEmpty>
+				<isNotEmpty property="etc6">
+					AND ETC6 = #etc6#
+				</isNotEmpty>
+				<isNotEmpty property="etc7">
+					AND ETC7 = #etc7#
+				</isNotEmpty>
+				<isNotEmpty property="etc8">
+					AND ETC8 = #etc8#
+				</isNotEmpty>
+				<isNotEmpty property="etc9">
+					AND ETC9 = #etc9#
+				</isNotEmpty>
+				<isNotEmpty property="etc10">
+					AND ETC10 = #etc10#
+				</isNotEmpty>
+			</iterate>
+		) X   
+		WHERE 1=1
+		ORDER BY MSGKEY DESC
+	</select>
+	
+	<!-- MMS 재전송 정보 조회  -->
+	<select id="getSelectResendMmsInfo"  parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		SELECT 
+			 MSGKEY
+			,SUBJECT
+			,PHONE
+			,CALLBACK
+			,ORG_CALLBACK
+			,BILL_ID
+			,STATUS
+			,REQDATE
+			,MSG
+			,EXPIRETIME
+			,SENTDATE
+			,RSLTDATE
+			,REPORTDATE
+			,TERMINATEDDATE
+			,IFNULL(RSLT , 2) as RSLT
+			,IFNULL(REPCNT , 0) as REPCNT
+			,TYPE
+			,TELCOINFO
+			,ID
+			,POST
+			,ETC1
+			,ETC2
+			,ETC3
+			,IFNULL(ETC4 , 0) AS ETC4
+			,ETC5
+			,ETC6
+			,ETC7
+			,ETC8
+			,ETC9
+			,ETC10
+		FROM  $log_table_name$
+		WHERE 1=1
+		AND MSGKEY = #msgkey#
+	</select>
+	
+	
+	<!-- //MMS 재전송 처리 후 FLAG 변경 -->
+	<update id="setUpdateFailMsgResendInfo" parameterClass="SmsManageVo">
+		UPDATE $log_table_name$ SET RSLT = '99999' WHERE MSGKEY = #msgkey#
+	</update>
+	
+	
+	
+	<!-- MMS LOG Table 발송내역 UNION 리스트 -->
+	<select id="getMmsLogTableUnionListEventContest" parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		SELECT X.*
+		FROM (
+			<iterate property="log_tables" conjunction="UNION">
+			 	SELECT 
+					 MSGKEY
+					,SUBJECT
+					,PHONE
+					,CALLBACK
+					,ORG_CALLBACK
+					,BILL_ID
+					,STATUS
+					,REQDATE
+					,DATE_FORMAT(REQDATE, '%Y%m') AS REQDATE_YM
+					,MSG
+					,EXPIRETIME
+					,SENTDATE
+					,RSLTDATE
+					,REPORTDATE
+					,TERMINATEDDATE
+					,RSLT
+					,IFNULL(REPCNT , 0) as REPCNT
+					,TYPE
+					,TELCOINFO
+					,ID
+					,POST
+					,ETC1
+					,ETC2
+					,ETC3
+					,IFNULL(ETC4 , 0) AS ETC4
+					,ETC5
+					,ETC6
+					,ETC7
+					,ETC8
+					,IFNULL(ETC9 , 0) AS ETC9
+					,ETC10
+				FROM  $log_tables[]$
+				WHERE 1=1
+				<isNotEmpty property="etc1">
+					AND ETC1 = #etc1#
+				</isNotEmpty>
+				<isNotEmpty property="etc2">
+					AND ETC2 = #etc2#
+				</isNotEmpty>
+				<isNotEmpty property="etc3">
+					AND ETC3 = #etc3#
+				</isNotEmpty>
+				<isNotEmpty property="etc5">
+					<isEqual property="etc5" compareValue="all" >
+						AND (ETC5 = #etc5# OR ETC5 like '%auto%' OR ETC5 IS NULL)
+					</isEqual>
+					<isNotEqual property="etc5" compareValue="all" >
+						AND ETC5 = #etc5#
+					</isNotEqual>
+				</isNotEmpty>
+				<isNotEmpty property="etc6">
+					AND ETC6 = #etc6#
+				</isNotEmpty>
+				<isNotEmpty property="etc7">
+					AND ETC7 = #etc7#
+				</isNotEmpty>
+				<isNotEmpty property="etc8">
+					AND ETC8 = #etc8#
+				</isNotEmpty>
+				<isNotEmpty property="etc9">
+					AND ETC9 = #etc9#
+				</isNotEmpty>
+				<isNotEmpty property="etc10">
+					AND ETC10 = #etc10#
+				</isNotEmpty>
+			</iterate>
+		) X   
+		WHERE 1=1
+		ORDER BY MSGKEY DESC
+	</select>
+	
+	
+	
+	
+	
+	
+	<!-- MMS LOG Table 발송내역 UNION 페이징 리스트 -->
+	<select id="getMmsLogTableUnionPagingList" parameterClass="SmsManageVo" resultClass="SmsManageVo">
+		SELECT X.*
+		FROM (
+			<iterate property="log_tables" conjunction="UNION">
+			 	SELECT 
+					 MSGKEY
+					,SUBJECT
+					,PHONE
+					,CALLBACK
+					,ORG_CALLBACK
+					,BILL_ID
+					,STATUS
+					,REQDATE
+					,DATE_FORMAT(REQDATE, '%Y%m') AS REQDATE_YM
+					,MSG
+					,EXPIRETIME
+					,SENTDATE
+					,RSLTDATE
+					,REPORTDATE
+					,TERMINATEDDATE
+					,RSLT
+					,IFNULL(REPCNT , 0) as REPCNT
+					,TYPE
+					,TELCOINFO
+					,ID
+					,POST
+					,ETC1
+					,ETC2
+					,ETC3
+					,IFNULL(ETC4 , 0) AS ETC4
+					,ETC5
+					,ETC6
+					,ETC7
+					,ETC8
+					,IFNULL(ETC9 , 0) AS ETC9
+					,ETC10
+				FROM  $log_tables[]$
+				WHERE 1=1
+				<isNotEmpty property="etc1">
+					AND ETC1 = #etc1#
+				</isNotEmpty>
+				<isNotEmpty property="etc2">
+					AND ETC2 = #etc2#
+				</isNotEmpty>
+				<isNotEmpty property="etc3">
+					AND ETC3 = #etc3#
+				</isNotEmpty>
+				<isNotEmpty property="etc5">
+					<isEqual property="etc5" compareValue="all" >
+						AND (ETC5 = #etc5# OR ETC5 = 'auto' OR ETC5 IS NULL)
+					</isEqual>
+					<isEqual property="etc5" compareValue="lane" >
+						AND ETC5 = #etc5#
+					</isEqual>
+					<isEqual property="etc5" compareValue="normal" >
+						AND ETC5 = #etc5#
+					</isEqual>
+					<isEqual property="etc5" compareValue="excelMember" >
+						AND ETC5 = #etc5#
+					</isEqual>
+				</isNotEmpty>
+				<isNotEmpty property="etc6">
+					AND ETC6 = #etc6#
+				</isNotEmpty>
+				<isNotEmpty property="etc7">
+					AND ETC7 = #etc7#
+				</isNotEmpty>
+				<isNotEmpty property="etc8">
+					AND ETC8 = #etc8#
+				</isNotEmpty>
+				<isNotEmpty property="etc9">
+					AND ETC9 = #etc9#
+				</isNotEmpty>
+				<isNotEmpty property="etc10">
+					AND ETC10 = #etc10#
+				</isNotEmpty>
+			</iterate>
+		) X   
+		WHERE 1=1
+		GROUP BY etc3
+		ORDER BY MSGKEY DESC
+		LIMIT  #currRow# , #endRow#
+	</select>
+	
+	
+	
+	
+	<!-- MMS LOG Table 발송내역 UNION 페이징 리스트 카운트 -->
+	<select id="getMmsLogTableUnionPagingListCnt" parameterClass="SmsManageVo" resultClass="int">
+	SELECT COUNT(1) cnt
+	FROM (
+	
+		SELECT *
+		FROM (
+			<iterate property="log_tables" conjunction="UNION">
+			 	SELECT 
+					 MSGKEY
+					,SUBJECT
+					,PHONE
+					,CALLBACK
+					,ORG_CALLBACK
+					,BILL_ID
+					,STATUS
+					,REQDATE
+					,DATE_FORMAT(REQDATE, '%Y%m') AS REQDATE_YM
+					,MSG
+					,EXPIRETIME
+					,SENTDATE
+					,RSLTDATE
+					,REPORTDATE
+					,TERMINATEDDATE
+					,RSLT
+					,IFNULL(REPCNT , 0) as REPCNT
+					,TYPE
+					,TELCOINFO
+					,ID
+					,POST
+					,ETC1
+					,ETC2
+					,ETC3
+					,IFNULL(ETC4 , 0) AS ETC4
+					,ETC5
+					,ETC6
+					,ETC7
+					,ETC8
+					,IFNULL(ETC9 , 0) AS ETC9
+					,ETC10
+				FROM  $log_tables[]$
+				WHERE 1=1
+				<isNotEmpty property="etc1">
+					AND ETC1 = #etc1#
+				</isNotEmpty>
+				<isNotEmpty property="etc2">
+					AND ETC2 = #etc2#
+				</isNotEmpty>
+				<isNotEmpty property="etc3">
+					AND ETC3 = #etc3#
+				</isNotEmpty>
+				<isNotEmpty property="etc5">
+					<isEqual property="etc5" compareValue="all" >
+						AND (ETC5 = #etc5# OR ETC5 = 'auto' OR ETC5 IS NULL)
+					</isEqual>
+					<isEqual property="etc5" compareValue="lane" >
+						AND ETC5 = #etc5#
+					</isEqual>
+					<isEqual property="etc5" compareValue="normal" >
+						AND ETC5 = #etc5#
+					</isEqual>
+					<isEqual property="etc5" compareValue="excelMember" >
+						AND ETC5 = #etc5#
+					</isEqual>
+				</isNotEmpty>
+				<isNotEmpty property="etc6">
+					AND ETC6 = #etc6#
+				</isNotEmpty>
+				<isNotEmpty property="etc7">
+					AND ETC7 = #etc7#
+				</isNotEmpty>
+				<isNotEmpty property="etc8">
+					AND ETC8 = #etc8#
+				</isNotEmpty>
+				<isNotEmpty property="etc9">
+					AND ETC9 = #etc9#
+				</isNotEmpty>
+				<isNotEmpty property="etc10">
+					AND ETC10 = #etc10#
+				</isNotEmpty>
+			</iterate>
+		) X   
+		WHERE 1=1
+		GROUP BY etc3
+	) QQ
+	</select>
+	
+	
+</sqlMap>

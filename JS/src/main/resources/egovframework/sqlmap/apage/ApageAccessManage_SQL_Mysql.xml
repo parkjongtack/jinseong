@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ApageAccessManage">
+	<typeAlias  alias="apageSystemManageVo" type="egovframework.apage.system.service.apageSystemManageVo"/>
+
+	<sql id="adminAccessBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT 
+					SEQ
+					,IP
+					,USE_YN
+					,REG_ID
+					,DATE_FORMAT(REG_DATE, '%Y-%m-%d') AS REG_DATE 
+					,MEMO
+					,UPDT_ID
+					,DATE_FORMAT(UPDT_DATE, '%Y-%m-%d') AS UPDT_DATE 
+				FROM COMTACCMANAGE
+				ORDER BY SEQ DESC
+		)X,(SELECT @ROWNUM := 0) R
+	
+	</sql>
+	
+	<!-- 관리자 접근 리스트 -->
+	<select id="selectadminAccList" parameterClass="apageSystemManageVo" resultClass="apageSystemManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="adminAccessBase"/>
+				WHERE 1=1
+					) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 관리자 접근 리스트 카운트 -->
+	<select id="selectadminAccListCnt" parameterClass="apageSystemManageVo" resultClass="int" >
+		SELECT
+			    COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="adminAccessBase"/>
+				WHERE 1=1
+					) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 관리자접근 등록 -->
+	<insert id="insertAdminAcc" parameterClass="apageSystemManageVo">
+		 INSERT INTO COMTACCMANAGE
+         	(
+				IP, USE_YN, REG_ID, REG_DATE, MEMO
+            )
+         VALUES
+	        (
+				#ip#, #use_yn#, #reg_id#, NOW(), #memo#	       			
+	        )
+		<selectKey keyProperty="seq" resultClass="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<!-- 관리자접근 수정 -->
+	<update id="updateAdminAcc" parameterClass="apageSystemManageVo">
+		UPDATE COMTACCMANAGE SET
+			IP 		= #ip#,
+			USE_YN  = #use_yn#,
+			MEMO	= #memo#,
+			UPDT_ID = #updt_id#, 
+			UPDT_DATE = NOW()
+		WHERE SEQ = #seq#
+	</update>
+	
+	<!-- 관리자접근 상세정보 -->
+	<select id="getAdminAccView" parameterClass="apageSystemManageVo" resultClass="apageSystemManageVo" >
+		SELECT 
+			SEQ
+			,IP
+			,USE_YN
+			,REG_ID
+			,DATE_FORMAT(REG_DATE, '%Y-%m-%d') AS REG_DATE
+			,MEMO
+			,UPDT_ID
+			,DATE_FORMAT(UPDT_DATE, '%Y-%m-%d') AS UPDT_DATE
+		FROM COMTACCMANAGE
+		WHERE SEQ = #seq#
+	</select>
+	
+	<!-- 관리자페이지 접근ip체크 -->
+	<select id="getAdminAccCnt" parameterClass="apageSystemManageVo" resultClass="int" >
+		SELECT COUNT(*) AS CNT 
+		FROM COMTACCMANAGE
+		WHERE IP = #ip#
+	</select>
+	
+	<!-- 관리자ip 삭제 -->
+	<delete id="deleteAdminAcc" parameterClass="apageSystemManageVo">
+		DELETE FROM COMTACCMANAGE
+		WHERE SEQ = #seq#
+	</delete>
+	
+	<!-- 로그입력 -->
+	<insert id="insertAgentLog"  parameterClass="apageSystemManageVo">
+		INSERT INTO COMTAGENTLOG
+         	(
+				ID, IP, METHOD, FULL_PAGE_URL, BROWSER, PAGE_URL, REG_DT, PARAM
+            )
+         VALUES
+	        (
+	        	#id#, #ip#, #method#, #full_page_url#, #browser#, #page_url#, now(), #param#
+	        )
+		<selectKey keyProperty="seq" resultClass="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+</sqlMap>

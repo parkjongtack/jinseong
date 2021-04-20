@@ -1,0 +1,1015 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="BoardManage">
+	<typeAlias  alias="BoardManageVo" type="egovframework.client.board.service.BoardManageVo"/>
+	
+	<!-- 게시판 베이스 -->
+	<sql id="BoardBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+			SELECT
+					NTT_ID
+					,BBS_ID
+					,NTT_SJ
+					,NTT_CN
+					,ANSWER_AT
+					,PARNTSCTT_NO
+					,SORT_ORDR
+					,RDCNT
+					,USE_AT
+					,DATE_FORMAT(NTCE_BGNDE, '%Y-%m-%d') AS NTCE_BGNDE
+					,DATE_FORMAT(NTCE_ENDDE, '%Y-%m-%d') AS NTCE_ENDDE
+					,NTCR_ID
+					,NTCR_NM
+					,NTUP_ID
+					,NTUP_NM
+					,PASSWORD
+					,ATCH_FILE_ID
+					,DATE_FORMAT(REG_DT, '%Y-%m-%d') AS REG_DT
+					,DATE_FORMAT(UPDT_DT, '%Y-%m-%d') AS UPDT_DT
+					,CHECK_YN
+					,ATCH_FILE_ID2
+					,MEMO
+					,OPEN_YN
+					,AS_TYPE
+					,AS_STATUS
+				FROM COMTBOARD
+				WHERE BBS_ID = #bbs_id#
+				<isNotEmpty property="scType">
+				 	<isEqual property="scType" compareValue="subject">
+						AND NTT_SJ like concat('%',#srch_input#,'%')
+				 	</isEqual>
+				 	<isEqual property="scType" compareValue="name">
+						AND NTCR_NM like concat('%',#srch_input#,'%')
+				 	</isEqual>
+			 	</isNotEmpty>
+			 	<isEmpty property="scType">
+			 		<isNotEmpty property="srch_input">
+			 			AND (NTCR_NM like concat('%',#srch_input#,'%') OR  NTT_SJ like concat('%',#srch_input#,'%'))
+			 		</isNotEmpty>
+			 	</isEmpty>
+			 	<isNotEmpty property="as_type">
+			 		<isNotEmpty property="as_type">
+			 			AND AS_TYPE = #as_type#
+			 		</isNotEmpty>
+			 	</isNotEmpty>				
+			 )X,(SELECT @ROWNUM := 0) R	
+	</sql>
+	
+	<!-- staff 베이스 -->
+	<sql id="staffBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+			SELECT
+			 seq, staff_name, asso_type, staff_type, team,
+             pro_no, career, use_hand, point_rank, hit,
+             staff_info, reg_dt, reg_id, atch_file_id,atch_file_id2					
+			FROM staff_manage
+		)X,(SELECT @ROWNUM := 0) R			 
+	</sql>
+	
+	<!-- 공지 리스트 -->
+	<select id="getTopBoardList" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT 
+			 NTT_ID
+			,BBS_ID
+			,NTT_SJ
+			,ANSWER_AT
+			,PARNTSCTT_NO
+			,SORT_ORDR
+			,RDCNT
+			,USE_AT
+			,DATE_FORMAT(NTCE_BGNDE, '%Y-%m-%d') AS NTCE_BGNDE
+			,DATE_FORMAT(NTCE_ENDDE, '%Y-%m-%d') AS NTCE_ENDDE
+			,NTCR_ID
+			,NTCR_NM
+			,NTUP_ID
+			,NTUP_NM
+			,PASSWORD
+			,ATCH_FILE_ID
+			,DATE_FORMAT(REG_DT, '%Y-%m-%d') AS REG_DT
+			,DATE_FORMAT(UPDT_DT, '%Y-%m-%d') AS UPDT_DT
+			,CHECK_YN
+			,ATCH_FILE_ID2
+			,MEMO
+			,OPEN_YN
+			,AS_TYPE
+			,AS_STATUS
+		FROM COMTBOARD
+		WHERE BBS_ID = #bbs_id#
+		AND CHECK_YN = 'Y'
+		AND USE_AT = 'Y'
+        ORDER BY NTT_ID DESC 
+	</select>
+	
+	<!-- 게시판 리스트 -->
+	<select id="selectBoardList" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="BoardBase"/>
+				 	 WHERE 1 = 1
+					 AND use_at != 'N'
+					 <isEqual property="bbs_id" compareValue="center">
+					 ORDER BY ntt_sj ASC
+					 </isEqual>
+					 <isNotEqual property="bbs_id" compareValue="center">
+					 ORDER BY ntt_id DESC
+					 </isNotEqual>
+					
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 게시판 리스트 카운트 -->
+	<select id="selectBoardListCnt" parameterClass="BoardManageVo" resultClass="int" >
+		SELECT
+			    COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 				<include refid="BoardBase"/>
+ 				WHERE 1 = 1
+ 				
+				 AND use_at != 'N' 
+			) Y
+		 ) Z
+	</select>
+	
+	
+	<!-- 게시판 상세 -->
+	<select id="getBoardView" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			 NTT_ID
+			,BBS_ID
+			,NTT_SJ
+			,NTT_CN
+			,ANSWER_AT
+			,PARNTSCTT_NO
+			,SORT_ORDR
+			,RDCNT
+			,USE_AT
+			,DATE_FORMAT(NTCE_BGNDE, '%Y-%m-%d') AS NTCE_BGNDE
+			,DATE_FORMAT(NTCE_ENDDE, '%Y-%m-%d') AS NTCE_ENDDE
+			,NTCR_ID
+			,NTCR_NM
+			,NTUP_ID
+			,NTUP_NM
+			,PASSWORD
+			,ATCH_FILE_ID
+			,DATE_FORMAT(REG_DT, '%Y-%m-%d') AS REG_DT
+			,DATE_FORMAT(UPDT_DT, '%Y-%m-%d') AS UPDT_DT
+			,CHECK_YN
+			,ATCH_FILE_ID2
+			,MEMO
+			,OPEN_YN
+			,AS_TYPE
+			,AS_TEL
+			,AS_STATUS
+			,IFNULL(CT_SEQ,0) as CT_SEQ
+		 FROM COMTBOARD
+		WHERE NTT_ID = #ntt_id#
+		AND use_at != 'N'
+	</select>
+	
+	<!-- 게시판 삭제 -->
+	<delete id="BoardDelete" parameterClass="BoardManageVo">
+		DELETE 	FROM COMTBOARD
+		WHERE	NTT_ID = #ntt_id#
+	</delete>
+	
+	<!-- 조회수 증가 -->
+	<update id="BoardUpdateCnt" parameterClass="BoardManageVo" >
+		UPDATE	COMTBOARD 
+		SET		RDCNT = IFNULL(RDCNT,0) + 1
+		WHERE	NTT_ID = #ntt_id#
+	</update>
+	
+	<!-- 다음글 -->
+	<select id="getNextBoardView" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT 	
+			 NTT_ID
+			,BBS_ID
+			,NTT_SJ
+			,NTT_CN
+			,ANSWER_AT
+			,PARNTSCTT_NO
+			,SORT_ORDR
+			,RDCNT
+			,USE_AT
+			,DATE_FORMAT(NTCE_BGNDE, '%Y-%m-%d') AS NTCE_BGNDE
+			,DATE_FORMAT(NTCE_ENDDE, '%Y-%m-%d') AS NTCE_ENDDE
+			,NTCR_ID
+			,NTCR_NM
+			,NTUP_ID
+			,NTUP_NM
+			,PASSWORD
+			,ATCH_FILE_ID
+			,DATE_FORMAT(REG_DT, '%Y-%m-%d') AS REG_DT
+			,DATE_FORMAT(UPDT_DT, '%Y-%m-%d') AS UPDT_DT
+			,CHECK_YN
+			,ATCH_FILE_ID2
+			,MEMO
+			,OPEN_YN
+			,AS_TYPE
+			,AS_STATUS			
+		FROM COMTBOARD 
+        WHERE 1 = 1 
+        AND BBS_ID = #bbs_id# 
+        AND NTT_ID <![CDATA[>]]> #ntt_id# <!-- =  #ntt_id# + 1 -->
+        AND use_at != 'N'
+        ORDER BY ntt_id ASC
+		LIMIT 1
+	</select>
+	
+	<!-- 이전글 -->
+	<select id="getPreBoardView" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT 	
+			NTT_ID
+			,BBS_ID
+			,NTT_SJ
+			,NTT_CN
+			,ANSWER_AT
+			,PARNTSCTT_NO
+			,SORT_ORDR
+			,RDCNT
+			,USE_AT
+			,DATE_FORMAT(NTCE_BGNDE, '%Y-%m-%d') AS NTCE_BGNDE
+			,DATE_FORMAT(NTCE_ENDDE, '%Y-%m-%d') AS NTCE_ENDDE
+			,NTCR_ID
+			,NTCR_NM
+			,NTUP_ID
+			,NTUP_NM
+			,PASSWORD
+			,ATCH_FILE_ID
+			,DATE_FORMAT(REG_DT, '%Y-%m-%d') AS REG_DT
+			,DATE_FORMAT(UPDT_DT, '%Y-%m-%d') AS UPDT_DT
+			,CHECK_YN
+			,ATCH_FILE_ID2
+			,MEMO
+			,OPEN_YN
+			,AS_TYPE
+			,AS_STATUS			
+		FROM COMTBOARD 
+       	WHERE 1 = 1 
+       	AND BBS_ID = #bbs_id# 
+       	AND NTT_ID <![CDATA[<]]> #ntt_id# <!-- =  #ntt_id# - 1 -->
+       	AND use_at != 'N'
+        ORDER BY ntt_id DESC
+		LIMIT 1
+	</select>
+	
+	
+	<!-- 게시판 인서트 -->
+	<insert id="insertBoard" parameterClass="BoardManageVo" >
+		 INSERT INTO COMTBOARD
+         	(
+					 BBS_ID
+					,NTT_SJ
+					,NTT_CN
+					,ANSWER_AT
+					,PARNTSCTT_NO
+					,SORT_ORDR
+					,USE_AT
+					,NTCE_BGNDE
+					,NTCE_ENDDE
+					,NTCR_ID
+					,NTCR_NM
+					,PASSWORD
+					,ATCH_FILE_ID
+					,REG_DT
+					,CHECK_YN
+					,ATCH_FILE_ID2
+					,MEMO
+					,AS_TYPE
+					,AS_TEL
+					,AS_EMAIL
+					,AS_STATUS
+					,OPEN_YN
+					,TEMP1
+					,TEMP2
+					,TEMP3
+					,TEMP4
+             )
+         VALUES
+	         (
+					#bbs_id#
+					,#ntt_sj#
+					,#ntt_cn#
+					,#answer_at#
+					,#parntsctt_no#
+					,#sort_ordr#
+					,#use_at#
+					,#ntce_bgnde#
+					,#ntce_endde#
+					,#ntcr_id#
+					,#ntcr_nm#
+					,#password#
+					,#atch_file_id#
+					,NOW()
+					,#check_yn#
+					,#atch_file_id2#
+					,#memo#
+					,#as_type#
+					,#as_tel#
+					,#as_email#
+					,#as_status#
+					,#open_yn#
+					,#temp1#
+					,#temp2#
+					,#temp3#
+					,#temp4#
+	         )
+	    <selectKey keyProperty="ntt_id" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<!-- 게시판 수정  -->
+	<update id="updateBoard" parameterClass="BoardManageVo">
+		UPDATE COMTBOARD
+		SET  
+			 UPDT_DT			=		NOW()
+			 <isNotEmpty property="ntt_sj">
+			,NTT_SJ				=		#ntt_sj#
+			</isNotEmpty>
+			 <isNotEmpty property="ntt_cn">
+			,NTT_CN				=		#ntt_cn#
+			</isNotEmpty>
+			<isNotEmpty property="answer_at">
+			,ANSWER_AT			=		#answer_at#
+			</isNotEmpty>
+			<isNotEmpty property="use_at">
+			,USE_AT				=		#use_at#
+			</isNotEmpty>
+			<isNotEmpty property="ntce_bgnde">
+			,NTCE_BGNDE			=		#ntce_bgnde#
+			</isNotEmpty>
+			<isNotEmpty property="ntce_endde">
+			,NTCE_ENDDE			=		#ntce_endde#
+			</isNotEmpty>
+			<isNotEmpty property="ntup_id">
+			,NTUP_ID			=		#ntup_id#
+			</isNotEmpty>
+			<isNotEmpty property="ntup_nm">
+			,NTUP_NM			=		#ntup_nm#
+			</isNotEmpty>
+			<isNotEmpty property="password">
+			,PASSWORD			=		#password#
+			</isNotEmpty>
+			<isNotEmpty property="atch_file_id">
+			,ATCH_FILE_ID		=		#atch_file_id#
+			</isNotEmpty>
+			<isNotEmpty property="check_yn">
+			,CHECK_YN			=		#check_yn#
+			</isNotEmpty>
+			<isNotEmpty property="atch_file_id2">
+			,ATCH_FILE_ID2		=		#atch_file_id2#
+			</isNotEmpty>
+			<isNotEmpty property="memo">
+			,MEMO				=		#memo#
+			</isNotEmpty>
+			<isNotEmpty property="open_yn">
+			,OPEN_YN			=		#open_yn#
+			</isNotEmpty>
+			<isNotEmpty property="as_type">
+			,AS_TYPE			=		#as_type#
+			</isNotEmpty>
+			<isNotEmpty property="as_tel">
+			,AS_TEL			=		#as_tel#
+			</isNotEmpty>
+			<isNotEmpty property="as_email">
+			,AS_EMAIL			=		#as_email#
+			</isNotEmpty>
+			<isNotEmpty property="as_status">
+			,AS_STATUS			=		#as_status#
+			</isNotEmpty>
+			<isNotEmpty property="temp1">
+			,TEMP1			=		#temp1#
+			</isNotEmpty>
+			<isNotEmpty property="temp2">
+			,TEMP2			=		#temp2#
+			</isNotEmpty>
+			<isNotEmpty property="temp3">
+			,TEMP3			=		#temp3#
+			</isNotEmpty>
+			<isNotEmpty property="temp4">
+			,TEMP4			=		#temp4#
+			</isNotEmpty>
+		WHERE NTT_ID = #ntt_id#
+	</update>
+	
+	
+	
+	<!-- staff 리스트 -->
+	<select id="selectStaffList" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="staffBase"/>
+				 	 WHERE 1 = 1
+					 <isNotEmpty property="asso_type">
+					 	AND asso_type = #asso_type#
+					 </isNotEmpty>
+					 <isEmpty property="scType">
+					 	<isNotEmpty property="srch_input">
+					 		AND (staff_name like concat('%',#srch_input#,'%') OR team like concat('%',#srch_input#,'%'))
+					 	</isNotEmpty>
+					 </isEmpty>
+					ORDER BY seq DESC
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- staff 리스트 카운트 -->
+	<select id="selectStaffListCnt" parameterClass="BoardManageVo" resultClass="int" >
+		SELECT
+			    COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 				<include refid="staffBase"/>
+ 				WHERE 1 = 1
+ 				 <isNotEmpty property="asso_type">
+					 	AND asso_type = #asso_type#
+				 </isNotEmpty>
+				 <isEmpty property="scType">
+				 	<isNotEmpty property="srch_input">
+				 		AND (staff_name like concat('%',#srch_input#,'%') OR  team like concat('%',#srch_input#,'%'))
+				 	</isNotEmpty>
+				 </isEmpty>
+			) Y
+		 ) Z
+	</select>
+	
+	<!-- staff 상세 -->
+	<select id="getStaffView" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			 seq, staff_name, asso_type, staff_type, team,
+             pro_no, career, use_hand, point_rank, hit,
+             staff_info, reg_dt, reg_id, atch_file_id
+		 FROM staff_manage
+		WHERE seq = #seq#
+	</select>
+	
+	<!-- 조회수 증가 -->
+	<update id="staffCnt" parameterClass="BoardManageVo" >
+		UPDATE	staff_manage SET
+		hit = IFNULL(hit,0) + 1
+		WHERE seq = #seq#
+	</update>
+	
+	
+	
+	<!-- 대회신청 리스트 베이스 -->
+	<sql id="contestBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					 cm.ct_seq
+					,cm.ct_sbj
+					,cm.ct_content
+					,cm.ct_place
+					,cm.ct_dt
+					,cm.ct_process
+					,cm.atch_file_id
+					,cm.check_yn
+					,cm.hit
+					,cm.reg_id
+					,cm.updt_id
+					,DATE_FORMAT(cm.reg_dt, '%Y-%m-%d') AS REG_DT
+					,DATE_FORMAT(cm.updt_dt, '%Y-%m-%d') AS UPDT_DT
+		  			,DATE_FORMAT(cm.app_start_dt, '%Y-%m-%d') AS APP_START_DT
+					,cm.APP_START_H
+					,cm.APP_START_M
+					,DATE_FORMAT(cm.app_end_dt, '%Y-%m-%d') AS APP_END_DT
+					,cm.APP_END_H
+					,cm.APP_END_M	  
+					,(SELECT IFNULL(MAX(ntt_id),0) FROM COMTBOARD WHERE CT_SEQ = cm.CT_SEQ LIMIT 1) AS ntt_id
+					,cm.use_at
+					,cm.expose_yn
+					,cm.cut_yn
+					,cm.ct_result
+				FROM contest_manage cm
+				WHERE cm.use_at = 'Y'
+				<isNotEmpty property="scType">
+			 		<isEqual property="scType" compareValue="R">
+			 			AND (ct_process = 'R'OR ct_process = 'S')
+			 		</isEqual>
+			 	</isNotEmpty>
+				<isNotNull property="srch_input">
+				 	<isNotEmpty property="srch_input">
+				 		AND (ct_sbj like concat('%',#srch_input#,'%') OR  ct_content like concat('%',#srch_input#,'%'))
+				 	</isNotEmpty>
+				</isNotNull>
+		)X,(SELECT @ROWNUM := 0) R			 
+	</sql>
+	
+	
+	<!-- 대회신청 리스트 -->
+	<select id="selectContestList" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	<include refid="contestBase"/>
+				 	WHERE 1 = 1
+					ORDER BY ct_seq DESC
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 대회신청 리스트 카운트 -->
+	<select id="selectContestListCnt" parameterClass="BoardManageVo" resultClass="int" >
+			SELECT  COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 				<include refid="contestBase"/>
+ 				WHERE 1 = 1
+			) Y
+		 ) Z
+	</select>
+	
+	<!-- 대회 상세 -->
+	<select id="getContestView" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		<!-- 
+		SELECT
+			ct_seq, ct_sbj, ct_content, ct_place,
+			ct_dt, ct_process, atch_file_id, check_yn, hit,	limit_part,		  
+			reg_id, updt_id, DATE_FORMAT(reg_dt, '%Y-%m-%d') AS REG_DT,
+			DATE_FORMAT(updt_dt, '%Y-%m-%d') AS UPDT_DT	  
+			,DATE_FORMAT(app_start_dt, '%Y-%m-%d') AS APP_START_DT
+			,APP_START_H
+			,APP_START_M
+			,DATE_FORMAT(app_end_dt, '%Y-%m-%d') AS APP_END_DT
+			,APP_END_H
+			,APP_END_M
+		 FROM contest_manage
+		WHERE ct_seq = #ct_seq#
+		 -->
+		
+		
+		SELECT *
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND (STATUS = '0004' OR STATUS = '0005')) AS APP_CNT
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0004' AND part = '1') AS part1_app_cnt
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0005' AND part = '1') AS part1_wait_cnt
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0004' AND part = '2') AS part2_app_cnt
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0005' AND part = '2') AS part2_wait_cnt
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0004' AND part = '3') AS part3_app_cnt
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0005' AND part = '3') AS part3_wait_cnt
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0004' AND part = '4') AS part4_app_cnt
+				,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = CM.CT_SEQ AND STATUS = '0005' AND part = '4') AS part4_wait_cnt
+		FROM( 
+				SELECT
+					 CT_SEQ
+					,CT_SBJ
+					,CT_CONTENT
+					,CT_PLACE
+					,CT_DT
+					,CT_PROCESS
+					,ATCH_FILE_ID
+					,LIMIT_PART
+					,HIT
+					,CHECK_YN
+					,USE_AT
+					,ifnull(LIMIT_WAITING,0) as LIMIT_WAITING
+					,DATE_FORMAT(reg_dt, '%Y-%m-%d') AS REG_DT
+					,REG_ID
+					,DATE_FORMAT(updt_dt, '%Y-%m-%d') AS UPDT_DT 
+					,UPDT_ID	
+					,DATE_FORMAT(app_start_dt, '%Y-%m-%d') AS APP_START_DT
+					,APP_START_H
+					,APP_START_M
+					,DATE_FORMAT(app_end_dt, '%Y-%m-%d') AS APP_END_DT
+					,APP_END_H
+					,APP_END_M
+					,CT_GROUP
+					,UPDT_YN
+					,ct_bank
+					,ct_acchholder
+					,ct_account
+					,ct_price
+					,DATE_FORMAT(ct_deposit_stdt, '%Y-%m-%d') AS ct_deposit_stdt
+					,ct_deposit_sth
+					,ct_deposit_stm
+					,DATE_FORMAT(ct_deposit_eddt, '%Y-%m-%d') AS ct_deposit_eddt
+					,ct_deposit_edh
+					,ct_deposit_edm
+					
+					,DATE_FORMAT(refund_finish_date, '%Y-%m-%d') AS refund_finish_date
+					,refund_finish_h
+					,refund_finish_m
+					,situation_show_yn
+					,result_sms_send_yn
+ 					,lane_sms_send_yn
+				FROM contest_manage
+				WHERE CT_SEQ = #ct_seq#
+		) CM
+		
+	</select>
+	
+	<!-- 대회 조회수 증가 -->
+	<update id="UpdateContestCnt" parameterClass="BoardManageVo" >
+		UPDATE	contest_manage SET
+		hit = IFNULL(hit,0) + 1
+		WHERE ct_seq = #ct_seq#
+	</update>
+	
+	
+	<!-- 사용자 대회신청  -->
+	<insert id="insertAppContest" parameterClass="BoardManageVo" >
+		INSERT INTO contest_app(
+             ct_seq, join_name, deposit_name, birth, gender,
+             telno, email, disable_yn, 
+             handicap, part, lane, status, agree_yn, reg_dt, reg_id, ct_group
+        )
+		VALUES(			
+		    #ct_seq#, #join_name#, #deposit_name#, #birth#, #gender#,
+		    fn_encrypt(#telno#), fn_encrypt(#email#), #disable_yn#, 
+		    #handicap#, #part#, #lane#, #status#,'Y', now(), #reg_id# ,#ct_group#
+		 )		        
+	    <selectKey keyProperty="app_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<select id="pc_insertAppContest" parameterClass="BoardManageVo"  resultClass="int">
+		{ CALL ps_app_contest(
+			 #ct_seq#, #join_name#, #deposit_name#, #birth#, #gender#,
+		    #telno#, #email#, #disable_yn#, 
+		    #handicap#, #part#, #lane#, #status#,'Y',  #reg_id#
+		    ,#limit_part#, #limit_waiting#
+		 )
+		 }
+	</select>
+	
+	
+	<!-- 대회신청 중복체크 -->
+	<select id="chkMberApp" parameterClass="BoardManageVo" resultClass="int">
+		SELECT COUNT(*) 
+		FROM contest_app
+		WHERE reg_id = #reg_id# 
+		AND ct_seq = #ct_seq#
+	</select>
+	
+	<!-- 대회신청 가능여부 -->
+	<select id="chkAppProcess" parameterClass="BoardManageVo" resultClass="BoardManageVo">
+		SELECT
+			ct_process	  			
+		 FROM contest_manage
+		WHERE ct_seq = #ct_seq#
+	</select>
+	
+	<!-- 대회 조별 정원체크 -->
+	<select id="chkLimitPart" parameterClass="BoardManageVo" resultClass="int">
+		SELECT COUNT(*) 
+		FROM contest_app		
+		WHERE ct_seq = #ct_seq#
+		AND part = #part#
+	</select>
+	
+	
+	<!-- 게시판 리스트 -->
+	<select id="selectMain" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="BoardBase"/>
+				 	 WHERE 1 = 1
+				 	 <!-- AND BBS_ID = #bbs_id# -->
+					 ORDER BY ntt_id DESC
+				  ) Y
+		     ) Z
+		WHERE ROWNUM = 1
+	</select>
+	
+	<!-- 게시판 리스트 -->
+	<select id="selectMainList" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="BoardBase"/>
+				 	 WHERE 1 = 1
+				 	 <!-- AND BBS_ID = #bbs_id# -->
+					 ORDER BY ntt_id DESC
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN 2 AND #endRow# <!-- 4 -->
+	</select>
+	
+	
+	
+	
+	
+	<!-- 마이페이지 - 대회신청내역 리스트 -->
+	<select id="selectMyContestList" parameterClass="BoardManageVo" resultClass="BoardManageVo">
+		SELECT
+			Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+					SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+					FROM (
+						SELECT
+							manage.ct_seq,
+							manage.ct_sbj, 
+							manage.ct_dt, 
+							manage.ct_place,
+							manage.ct_process,
+							manage.expose_yn
+						FROM contest_app AS app 
+						JOIN contest_manage AS manage
+						ON app.ct_seq = manage.ct_seq
+						WHERE app.reg_id = #reg_id#
+						<isNotNull property="srch_input">
+							<isNotEmpty property="srch_input">
+								AND (manage.ct_sbj LIKE CONCAT('%',#srch_input#,'%'))
+							</isNotEmpty>
+						</isNotNull>
+						GROUP BY app.ct_seq
+						ORDER BY app.reg_dt DESC
+					)X,(SELECT @ROWNUM := 0) R
+				) Y
+			) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 마이페이지 - 대회신청내역 리스트 카운트 -->
+	<select id="selectMyContestListCnt" parameterClass="BoardManageVo" resultClass="int">
+		SELECT COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 					SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+					FROM (
+						SELECT
+							manage.ct_sbj, 
+							manage.ct_dt, 
+							manage.ct_place,
+							manage.ct_process
+						FROM contest_app AS app 
+						JOIN contest_manage AS manage
+						ON app.ct_seq = manage.ct_seq
+						WHERE app.reg_id = #reg_id#
+						<isNotNull property="srch_input">
+							<isNotEmpty property="srch_input">
+								AND (manage.ct_sbj LIKE CONCAT('%',#srch_input#,'%'))
+							</isNotEmpty>
+						</isNotNull>
+						GROUP BY app.ct_seq
+						ORDER BY app.reg_dt DESC
+					)X,(SELECT @ROWNUM := 0) R
+				) Y
+		 	) Z
+	</select>
+	
+	<!-- 마이페이지 - 대회신청내역 상세 -->
+	<select id="selectMyContestView" parameterClass="BoardManageVo" resultClass="BoardManageVo">
+		SELECT
+			ca.app_seq,
+			ca.ct_seq,
+			ca.join_name,
+			ca.deposit_name,
+			ca.birth,
+			ca.gender,
+			fn_decrypt(ca.telno) as telno,
+			fn_decrypt(ca.email) as email,
+			ca.disable_yn,
+			ca.handicap,
+			ca.part,
+			ca.lane,
+			ca.status,
+			ca.waiting_num,
+			ca.reg_id,
+			DATE_FORMAT(ca.reg_dt, '%Y-%m-%d') reg_dt,
+			(select updt_yn from contest_manage where ct_seq = ca.ct_seq) as updt_yn,
+			ca.pay_flag,
+			ca.refund_bank,
+			ca.refund_accholder,
+			ca.refund_account,
+			cm.expose_yn,
+			cm.ct_result,
+			cm.ct_process
+		FROM contest_app ca
+		JOIN contest_manage cm
+		WHERE cm.ct_seq = ca.ct_seq
+		AND ca.ct_seq = #ct_seq# 
+		AND ca.reg_id = #reg_id#
+		<!-- 
+		AND status != '0003' 
+		AND status != '0005'
+		 -->
+		ORDER BY ca.reg_dt DESC
+		LIMIT 1
+	</select>
+	
+	<!-- 마이페이지 - 대회신청 취소 -->
+	<update id="cancelMyContest" parameterClass="BoardManageVo">
+		UPDATE contest_app
+		SET
+			part = #part#
+			,lane = ''
+			,status = '0003'
+			,updt_dt = NOW() 
+			,updt_id = #updt_id#
+			,refund_bank = #refund_bank#
+			,refund_accholder = #refund_accholder#
+			,refund_account = #refund_account#
+			,ct_group = CONCAT(ct_group,'_',app_seq)
+			,cancel_date = NOW()
+		WHERE app_seq = #app_seq#
+	</update>
+	
+	<!-- 마이페이지 - 대기조에서 1명 추출하기 -->
+	<select id="selectBackupMember" parameterClass="BoardManageVo" resultClass="BoardManageVo">
+		SELECT
+			app_seq,
+			ct_seq,
+			join_name,
+			deposit_name,
+			birth,
+			gender,
+			fn_decrypt(telno) AS telno,
+			fn_decrypt(email) AS email,
+			disable_yn,
+			handicap,
+			part,
+			lane,
+			STATUS,
+			waiting_num,
+			reg_id,
+			DATE_FORMAT(reg_dt, '%Y-%m-%d') reg_dt
+		FROM contest_app
+		WHERE STATUS = '0005' 
+		AND waiting_num != 0 
+		AND ct_seq = #ct_seq#
+		AND part = #part#
+		ORDER BY waiting_num ASC
+		LIMIT 1
+	</select>
+	
+	<!-- 마이페이지 - 선정된 사람이 대회신청 취소할 경우, 추출한 대기자 넣기 -->
+	<update id="updateNewMember" parameterClass="BoardManageVo">
+		UPDATE contest_app
+		SET
+			part = #part#,
+			lane = #lane#,
+			STATUS = '0004',
+			waiting_num = 0,
+			updt_dt = NOW(), 
+			updt_id = #updt_id#
+		WHERE app_seq = #app_seq#
+	</update>
+	
+	
+	<!-- 대회신청 플래그변경 -->
+	<update id="updateContestManageFlag" parameterClass="BoardManageVo">
+		UPDATE contest_manage
+		SET
+			ct_process = #ct_process#
+			,updt_dt = NOW() 
+		WHERE ct_seq = #ct_seq#
+		<isNotEmpty property="ct_process">
+			<isEqual property="ct_process" compareValue="E" >
+				AND (ct_process != 'E' AND ct_process != 'F')
+			</isEqual>
+		</isNotEmpty>
+	</update>
+	
+	<!-- //대회 그룹 중복신청 조회 -->
+	<select id="selectGroupContestAppCnt" parameterClass="BoardManageVo" resultClass="int">
+		SELECT COUNT(*) CNT
+		FROM CONTEST_APP
+		WHERE REG_ID = #reg_id#
+		AND CT_SEQ IN 	
+		<iterate open="(" close=")" property="ct_seq_arr" conjunction=",">
+			 #ct_seq_arr[]#
+		</iterate>   
+	</select>
+	
+	<!-- 마이페이지 대회신청정보 수정 -->
+	<update id="cpageUpdateMyContestAppInfo"  parameterClass="BoardManageVo" >
+		UPDATE CONTEST_APP SET
+			 telno = fn_encrypt(#telno#)
+			,email = fn_encrypt(#email#)
+			,handicap = #handicap#
+			,disable_yn = #disable_yn#
+			,refund_bank = #refund_bank#
+			,refund_accholder = #refund_accholder#
+			,refund_account = #refund_account#
+		WHERE APP_SEQ = #app_seq#
+	</update>
+	
+	<!-- 대회신청 리스트 -->
+	<select id="selectClientContestAppList" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+			 	 		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+						FROM (
+								SELECT
+								  app_seq, ct_seq, join_name, deposit_name,
+								  birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+								  disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+								  ,IFNULL(waiting_num,0) as waiting_num
+								  ,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f ,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l
+								  ,IFNULL(pay_flag,'N') as pay_flag	    
+								FROM contest_app
+								WHERE 1 = 1
+								AND ct_seq = #ct_seq#
+								<isNotNull property="part">
+							 		<isNotEmpty property="part">
+							 	 		AND part = #part#			
+								 	</isNotEmpty>
+							 	</isNotNull>		
+							 	<isNull property="status">
+							 	 	ORDER BY app_seq, reg_dt ASC
+						 	 	</isNull>		
+						 	 	<isNotNull property="status">
+							 	 	<isNotEmpty property="status">
+							 	 		AND STATUS = #status#
+							 	 		<!-- 
+							 	 		<isEqual property="status" compareValue="0004" >
+											ORDER BY lane_f*1,lane_l*1
+							 	 		</isEqual>
+							 	 		<isEqual property="status" compareValue="0005" >
+											ORDER BY waiting_num ASC
+							 	 		</isEqual>
+							 	 		 -->
+							 	 		 ORDER BY app_seq, reg_dt ASC
+							 	 	</isNotEmpty>
+						 	 	</isNotNull>	
+						)X,(SELECT @ROWNUM := 0) R
+				  ) Y
+		     ) Z
+	</select>
+	
+	
+	<!-- 대회 접수정보 ROWNUM 체크 -->
+	<select id="selectNowAppDataGetRownum" parameterClass="BoardManageVo" resultClass="BoardManageVo" >
+		SELECT 
+				 app_seq
+				,ct_seq
+				,STATUS
+				,reg_dt
+				,join_name
+				,reg_id
+				,part
+				,ROWNUM
+		FROM (
+			SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+			FROM (
+				SELECT 
+					 ca.app_seq
+					,ca.ct_seq
+					,ca.status
+					,ca.reg_dt
+					,ca.join_name
+					,ca.reg_id
+					,ca.part
+				FROM contest_app ca
+				WHERE ca.status != '0003'
+				AND ca.ct_seq = #ct_seq#
+				AND ca.part = #part#
+				ORDER BY ca.app_seq ASC, ca.REG_DT ASC
+			)X,(SELECT @ROWNUM := 0) R
+		) Q
+		WHERE Q.app_seq = #app_seq#
+		AND Q.reg_id = #reg_id#
+	</select>
+	
+	<!-- 대회 신청정보 삭제 -->
+	<delete id="deleteNowAppData" parameterClass="BoardManageVo">
+		delete from contest_app 
+		where app_seq = #app_seq#
+		and reg_id = #reg_id#
+		and ct_seq = #ct_seq#
+	</delete>
+	
+	
+	
+	
+	<!-- 쇼핑몰 이벤트 신청 플래그변경 -->
+	<update id="updateShopEventManageInfo" parameterClass="BoardManageVo">
+		UPDATE shop_event_manage SET 
+			  shop_event_process = #shop_event_process#
+	</update>
+	
+	
+</sqlMap>

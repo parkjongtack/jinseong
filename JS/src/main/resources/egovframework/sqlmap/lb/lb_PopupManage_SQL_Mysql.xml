@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="lbPopupManage">
+	<typeAlias  alias="apagePopupManageVo" type="egovframework.apage.system.service.apageSystemManageVo"/>
+	
+	<sql id="lb_adminPopupBase">
+		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					POP_SEQ
+					,POP_SUBJECT
+					,POP_WIDTH
+					,POP_HEIGHT
+					,POP_URL
+					,POP_ST_DT
+					,POP_ED_DT
+					,POP_CONTENT
+					,POP_STATE
+					,POP_SET
+					,POP_REG_NM
+					,POP_UP_NM
+					,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT 
+					,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT
+					,POP_POSITION_X
+					,POP_POSITION_Y  
+				FROM COMTNPOPUP
+				ORDER BY POP_SEQ DESC
+			)X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	
+	<!-- 팝업 메인페이지 리스트 조건 추가 -->
+	<select id="lb_selectClientPopupList" parameterClass="apagePopupManageVo" resultClass="apagePopupManageVo" >
+		SELECT
+			POP_SEQ
+			,POP_SUBJECT
+			,POP_WIDTH
+			,POP_HEIGHT
+			,POP_URL
+			,POP_ST_DT
+			,POP_ED_DT
+			,POP_CONTENT
+			,POP_STATE
+			,POP_SET
+			,POP_REG_NM
+			,POP_UP_NM
+			,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT 
+			,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT
+			,POP_POSITION_X
+			,POP_POSITION_Y  
+		FROM COMTNPOPUP
+		WHERE POP_STATE = 'Y'
+		AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT 
+		ORDER BY POP_SEQ DESC 
+	</select>
+	<!-- 
+	<select id="lb_selectClientPopupList" parameterClass="apagePopupManageVo" resultClass="apagePopupManageVo" >
+		SELECT
+		    Z.*
+		FROM (
+				SELECT ROWNUM AS ASCNUM, X.*
+				  FROM(
+				 	 <include refid="lb_adminPopupBase"/>
+				 	 WHERE 1=1
+				  )X
+		     ) Z
+		WHERE Z.POP_STATE = 'Y'
+		AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN Z.POP_ST_DT AND Z.POP_ED_DT 
+	</select>
+	 -->
+	
+	
+</sqlMap>

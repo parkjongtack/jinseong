@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN"
+    "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<sqlMap resource="egovframework/sqlmap/common/CmmnCodeManage_SQL_mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/common/FileDownMng_SQL_mysql.xml"/>
+	<sqlMap resource="egovframework/sqlmap/common/FileUploadManage_SQL_mysql.xml"/>
+</sqlMapConfig>

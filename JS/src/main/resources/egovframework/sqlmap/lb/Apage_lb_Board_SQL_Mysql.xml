@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Apage_lb_BoardManage">
+	<typeAlias  alias="apageBoardManageVo" type="egovframework.apage.board.service.apageBoardManageVo"/>
+	
+	<!-- 대회신청 리스트 -->
+	<select id="lb_selectAdminContestList" parameterClass="apageBoardManageVo" resultClass="apageBoardManageVo" >
+		SELECT
+			Z.*
+			,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = Z.CT_SEQ) AS APP_CNT
+			,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = Z.CT_SEQ AND STATUS = '0004' AND part = '1') AS part1_app_cnt
+			,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = Z.CT_SEQ AND STATUS = '0004' AND part = '2') AS part2_app_cnt
+			,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = Z.CT_SEQ AND STATUS = '0004' AND part = '3') AS part3_app_cnt
+			,(SELECT COUNT(*) FROM contest_app WHERE ct_seq = Z.CT_SEQ AND STATUS = '0004' AND part = '4') AS part4_app_cnt
+		FROM (
+			SELECT
+				 CT_SEQ
+				,CT_SBJ
+				,CT_CONTENT
+				,CT_PLACE
+				,CT_DT
+				,CT_PROCESS
+				,ATCH_FILE_ID
+				,LIMIT_PART
+				,HIT
+				,CHECK_YN
+				,USE_AT
+				,DATE_FORMAT(reg_dt, '%Y-%m-%d') AS REG_DT
+				,REG_ID
+				,DATE_FORMAT(updt_dt, '%Y-%m-%d') AS UPDT_DT 
+				,UPDT_ID
+				,DATE_FORMAT(app_start_dt, '%Y-%m-%d') AS APP_START_DT
+				,APP_START_H
+				,APP_START_M
+				,DATE_FORMAT(app_end_dt, '%Y-%m-%d') AS APP_END_DT
+				,APP_END_H
+				,APP_END_M
+				,PREPARE_YN
+				,CT_GROUP
+				,situation_show_yn
+			FROM contest_manage
+			WHERE 1 = 1
+			ORDER BY ct_seq DESC
+			LIMIT #currRow# , 10
+		) Z
+	</select>
+	
+	
+	
+	<!-- 대회신청 리스트 카운트 -->
+	<select id="lb_selectAdminContestListCnt" parameterClass="apageBoardManageVo" resultClass="int" >
+		SELECT COUNT(1) CNT FROM contest_manage
+	</select>
+	
+	
+	<!-- 대회 상세 -->
+	<select id="lb_getAdminContestView" parameterClass="ApageBoardManageVo" resultClass="ApageBoardManageVo" >
+				SELECT
+					 CM.CT_SEQ
+					,CM.CT_SBJ
+					,CM.CT_CONTENT
+					,CM.CT_PLACE
+					,CM.CT_DT
+					,CM.CT_PROCESS
+					,CM.ATCH_FILE_ID
+					,CM.LIMIT_PART
+					,CM.HIT
+					,CM.CHECK_YN
+					,CM.USE_AT
+					,ifnull(CM.LIMIT_WAITING,0) as LIMIT_WAITING
+					,DATE_FORMAT(CM.reg_dt, '%Y-%m-%d') AS REG_DT
+					,CM.REG_ID
+					,DATE_FORMAT(CM.updt_dt, '%Y-%m-%d') AS UPDT_DT 
+					,CM.UPDT_ID	
+					,DATE_FORMAT(CM.app_start_dt, '%Y-%m-%d') AS APP_START_DT
+					,CM.APP_START_H
+					,CM.APP_START_M
+					,DATE_FORMAT(CM.app_end_dt, '%Y-%m-%d') AS APP_END_DT
+					,CM.APP_END_H
+					,CM.APP_END_M
+					,CM.PREPARE_YN
+					,CM.CT_GROUP
+					,CM.UPDT_YN
+					,CM.ct_bank
+					,CM.ct_acchholder
+					,CM.ct_account
+					,CM.ct_price
+					,DATE_FORMAT(CM.ct_deposit_stdt, '%Y-%m-%d') AS ct_deposit_stdt
+					,CM.ct_deposit_sth
+					,CM.ct_deposit_stm
+					,DATE_FORMAT(CM.ct_deposit_eddt, '%Y-%m-%d') AS ct_deposit_eddt
+					,CM.ct_deposit_edh
+					,CM.ct_deposit_edm
+					,DATE_FORMAT(CM.ct_sms_send_dt, '%Y%m') AS ct_sms_send_dt
+					,DATE_FORMAT(CM.ct_sms_send_dt, '%Y-%m-%d') AS ct_sms_send_dt2
+					,CM.EXPOSE_YN
+					,CM.CUT_YN
+					,DATE_FORMAT(CM.ct_lane_sms_send_dt, '%Y%m') AS ct_lane_sms_send_dt
+					,DATE_FORMAT(CM.ct_lane_sms_send_dt, '%Y-%m-%d') AS ct_lane_sms_send_dt2
+					
+					,DATE_FORMAT(CM.refund_finish_date, '%Y-%m-%d') AS refund_finish_date
+					,CM.refund_finish_h
+					,CM.refund_finish_m
+					,CM.situation_show_yn
+					,CM.result_sms_send_yn
+ 					,CM.lane_sms_send_yn
+				FROM contest_manage CM ,
+				(
+					SELECT 
+						 IFNULL(SUM(CASE WHEN STATUS = '0004' OR STATUS = '0005' THEN 1 ELSE 0 END),0) AS APP_CNT
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '1' THEN 1 ELSE 0 END),0) AS part1_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '1' THEN 1 ELSE 0 END),0) AS part1_wait_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '2' THEN 1 ELSE 0 END),0) AS part2_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '2' THEN 1 ELSE 0 END),0) AS part2_wait_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '3' THEN 1 ELSE 0 END),0) AS part3_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '3' THEN 1 ELSE 0 END),0) AS part3_wait_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '4' THEN 1 ELSE 0 END),0) AS part4_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '4' THEN 1 ELSE 0 END),0) AS part4_wait_cnt
+					FROM contest_app
+					WHERE ct_seq = #ct_seq#
+				) CA
+				WHERE CM.CT_SEQ = #ct_seq#
+	</select>
+	
+	
+	<!-- 대회신청 리스트 -->
+	<select id="lb_selectAdminContestAppList" parameterClass="ApageBoardManageVo" resultClass="ApageBoardManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+						SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+						FROM (
+								SELECT
+								  app_seq, ct_seq, join_name, deposit_name,
+								  birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+								  disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+								  ,IFNULL(waiting_num,0) as waiting_num
+								  ,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f ,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l
+								  ,IFNULL(pay_flag,'N') as pay_flag	    
+								  ,IFNULL(app_sms_flag,'N') as app_sms_flag	    
+								  ,app_sms_date
+								FROM contest_app
+							 	WHERE 1 = 1
+							 	AND ct_seq = #ct_seq#
+								 	<isNotNull property="part">
+								 		<isNotEmpty property="part">
+								 	 	AND part = #part#			
+									 	</isNotEmpty>
+								 	</isNotNull>
+								 	<isNull property="status">
+								 	 	ORDER BY app_seq, reg_dt ASC
+							 	 	</isNull>			
+							 	 	<isNotNull property="status">
+								 	 	<isNotEmpty property="status">
+								 	 		AND STATUS = #status#
+								 	 		<!-- 
+								 	 		<isEqual property="status" compareValue="0004" >
+												ORDER BY lane_f*1,lane_l*1
+								 	 		</isEqual>
+								 	 		<isEqual property="status" compareValue="0005" >
+												ORDER BY waiting_num ASC
+								 	 		</isEqual>
+								 	 		 -->
+								 			ORDER BY app_seq, reg_dt ASC
+								 		</isNotEmpty>
+							 	 	</isNotNull>	
+						)X,(SELECT @ROWNUM := 0) R	
+				  ) Y
+		     ) Z
+	</select>
+	
+	
+	<!-- 쇼핑몰 이벤트 대회 일자 -->
+	<select id="lb_selectAdminShopEventManageInfo" parameterClass="ApageBoardManageVo" resultClass="ApageBoardManageVo" >
+		SELECT 
+			shop_event_seq
+			,shop_event_process
+			,shop_event_start_dt
+			,shop_event_start_h
+			,shop_event_start_m
+			,shop_event_end_dt
+			,shop_event_end_h
+			,shop_event_end_m
+		FROM shop_event_manage
+		ORDER BY shop_event_seq DESC
+		LIMIT 1
+	</select>
+	
+	
+	
+</sqlMap>

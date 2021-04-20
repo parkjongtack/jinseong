@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ShopMemberManage">
+	<typeAlias  alias="ShopMemberManageVo" type="egovframework.client.member.service.ShopMemberManageVo"/>
+	
+	<resultMap id="shopMemberInfo" class="egovframework.client.member.service.ShopMemberManageVo">
+		<result property="mber_seq" 	 	column="no" />
+		<result property="mber_id" 		 	column="member_id" />
+		<result property="mber_pw"		 	column="pwd" />
+		<result property="mber_name"	 	column="name" />
+		<result property="mber_gender" 	 	column="sex" />
+		<result property="mber_birth"	 	column="birth" />
+		<result property="mber_tel"		 	column="cell" />
+		<result property="mber_email"		column="email" />
+		<result property="mailing_yn"	 	column="mailing" />
+		<!-- result property="agree_yn"		column="" / -->
+		<result property="sms_yn"		 	column="sms" />
+		<result property="zipcode"		 	column="zip" />
+		<result property="addr"			 	column="addr1" />
+		<result property="addr_detail" 	 	column="addr2" />
+		<result property="reg_dt"		 	column="reg_date" />
+		<result property="reg_ip"		 	column="ip" />
+		<result property="mber_status"	 	column="withdraw" />
+		<result property="withdraw_content"	column="withdraw_content" />
+		<result property="mber_phone"		column="phone" />
+		<result property="mber_milage"		column="milage" />
+		<result property="mber_emoney"		column="emoney" />
+		<result property="join_ref"	 	 	column="join_ref" />
+		<result property="last_login_dt" 	column="last_con" />
+		<result property="reg_code"	 	 	column="reg_code" />
+		<result property="di_yn"	 	 	column="di_yn" />
+		<result property="di_rejection_cnt"	column="di_rejection_cnt" />
+		<result property="di_date"			column="di_date" />
+		
+		<!-- 
+		<result property="reg_id"		 column="" />
+		<result property="updt_dt"		 column="" />
+		<result property="updt_id"		 column="" />
+		 -->
+		
+		<!-- 
+		<result property="mber_dupinfo"	 column="" />
+		<result property="mber_status"	 column="" />
+		-->
+	</resultMap>
+	
+	<resultMap id="shopMemberInfoAdmin" class="egovframework.client.member.service.ShopMemberManageVo">
+		<result property="mber_seq" 	 	column="no" />
+		<result property="mber_id" 		 	column="member_id" />
+		<result property="mber_pw"		 	column="pwd" />
+		<result property="mber_name"	 	column="name" />
+		<result property="mber_gender"   	column="sex" />
+		<result property="mber_birth"	 	column="birth" />
+		<result property="mber_tel"		 	column="cell" />
+		<result property="mber_email"	 	column="email" />
+		<result property="mailing_yn"	 	column="mailing" />
+		<result property="sms_yn"		 	column="sms" />
+		<result property="zipcode"		 	column="zip" />
+		<result property="addr"			 	column="addr1" />
+		<result property="addr_detail" 	 	column="addr2" />
+		<result property="reg_dt"		 	column="reg_date" />
+		<result property="reg_ip"		 	column="ip" />
+		<result property="mber_status"	 	column="withdraw" />
+		<!-- <result property="withdraw_content"	column="withdraw_content" /> -->
+		<result property="join_ref"	 	 	column="join_ref" />
+		<result property="last_login_dt" 	column="last_con" />
+		<result property="ascnum" 		 	column="ascnum" />
+		<result property="reg_code"	 	 	column="reg_code" />
+		<result property="di_yn"	 	 	column="di_yn" />
+		<result property="di_rejection_cnt"	column="di_rejection_cnt" />
+		<result property="di_date"			column="di_date" />
+		
+	</resultMap>
+	
+	<resultMap id="smsInfo" class="egovframework.client.member.service.ShopMemberManageVo">
+		<result property="mber_seq" 	 	column="no" />
+		<result property="mber_id" 		 	column="member_id" />
+		<result property="mber_pw"		 	column="pwd" />
+		<result property="mber_name"	 	column="name" />
+		<result property="mber_gender"   	column="sex" />
+		<result property="mber_birth"	 	column="birth" />
+		<result property="mber_tel"		 	column="cell" />
+		<result property="mber_email"	 	column="email" />
+		<result property="mailing_yn"	 	column="mailing" />
+		<result property="sms_yn"		 	column="sms" />
+		<result property="zipcode"		 	column="zip" />
+		<result property="addr"			 	column="addr1" />
+		<result property="addr_detail" 	 	column="addr2" />
+		<result property="reg_dt"		 	column="reg_date" />
+		<result property="reg_ip"		 	column="ip" />
+		<result property="mber_status"	 	column="withdraw" />
+		<result property="join_ref"	 	 	column="join_ref" />
+		<result property="last_login_dt" 	column="last_con" />
+		<!-- <result property="ascnum" 		 	column="ascnum" /> -->
+	</resultMap>
+	
+	
+	<!-- 회원베이스 -->
+	<sql id="shopMberbase">
+	SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					A.no
+					,A.member_id
+					,A.pwd
+					,A.name
+					,(case when A.sex ='남' then 'M'	when A.sex ='여' then 'F' else '' end) as sex
+					,A.birth						
+					,A.cell AS cell
+					,A.email AS email
+					,A.mailing
+					,A.sms
+					,A.zip, A.addr1, A.addr2
+					,from_unixtime(A.last_con, '%Y-%m-%d %h:%m:%s') AS last_con
+					,from_unixtime(A.reg_date, '%Y-%m-%d') AS reg_date
+					,A.withdraw
+					,A.withdraw_content
+					,A.phone AS phone
+					,A.milage
+					,A.emoney
+					,A.ip					
+					,A.join_ref
+					,A.reg_code	
+					,A.di_yn
+					,ifnull(A.di_rejection_cnt,0) as di_rejection_cnt
+					,A.di_date
+				FROM wm_member A
+			 )X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	<!-- 회원가입 인서트 -->
+	<insert id="insertShopMember" parameterClass="ShopMemberManageVo" >
+		INSERT INTO wm_member(
+			member_id, pwd, name, sex, birth, cell, email,
+            mailing, sms, zip, addr1, addr2, reg_date,
+            ip, withdraw, join_ref,
+            jumin,point_use, attend,blacklist,nations,mem_type,login_type,conversion,
+            reg_sms, reg_code
+            <isNotEmpty property="reg_code">
+            	,di_date
+				,di_yn
+            </isNotEmpty>
+            <isEmpty property="reg_code">
+	            <isNotEmpty property="join_ref">
+	            	<isEqual property="join_ref" compareValue="paper">
+						,di_yn
+						,di_rejection_cnt
+	            	</isEqual>
+            	</isNotEmpty>
+            </isEmpty>
+            ,milage
+            
+
+        )
+		VALUES (
+			#mber_id#, password(#mber_pw#), #mber_name#, #mber_gender#, #mber_birth#, #mber_tel#, #mber_email#,
+        	#mailing_yn#, #sms_yn#, #zipcode#, #addr#, #addr_detail#, unix_timestamp(),
+        	#reg_ip#, 'N', #join_ref#,
+        	'', 0, 0, 0, '', '', '', '',
+        	#reg_sms#, #reg_code#
+            <isNotEmpty property="reg_code">
+            	,now()
+				,'Y'
+            </isNotEmpty>
+             <isEmpty property="reg_code">
+	            <isNotEmpty property="join_ref">
+	            	<isEqual property="join_ref" compareValue="paper">
+						,'C'
+						,8
+	            	</isEqual>
+            	</isNotEmpty>
+            </isEmpty>
+            ,3000
+        )
+        <selectKey keyProperty="mber_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<!-- 회원가입시 이름 성별 연락처 생일 탈퇴여부로 중복체크 -->
+	<select id="checkShopMember" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT count(1) cnt
+		FROM wm_member
+		WHERE NAME = #mber_name#
+		<!-- AND sex = (case when #mber_gender# ='M' then '남' else '여' end) -->
+		AND sex = #mber_gender#		
+		AND cell = #mber_tel#
+		AND birth = #mber_birth#
+		AND withdraw = 'N'
+	</select>
+	
+	<!-- 아이디 확인 -->
+	<select id="idFind" parameterClass="ShopMemberManageVo" resultClass="String">
+		SELECT member_id 
+		FROM wm_member
+		WHERE NAME = #mber_name# 
+		AND cell = #mber_tel#
+		AND email = #mber_email#
+		AND withdraw = 'N'
+	</select>
+
+	<!-- 휴대폰 인증으로 아이디 확인  -->
+	<select id="midFind" parameterClass="ShopMemberManageVo" resultClass="String">
+		SELECT member_id 
+		FROM wm_member
+		WHERE reg_code = #reg_code# 
+		AND withdraw = 'N'
+	</select>
+
+	<!-- 비밀번호 체크  -->
+	<select id="pwFind" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT count(*) cnt
+		FROM wm_member
+		WHERE NAME = #mber_name#
+		AND member_id = #mber_id#  
+		AND cell = #mber_tel#
+		AND email = #mber_email#
+		AND withdraw = 'N'										
+		
+	</select>
+	
+ 	<!-- 휴대폰 인증으로 비밀번호 체크  --> 
+	<select id="mpwFind" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT count(*) cnt
+		FROM wm_member
+		WHERE reg_code = #reg_code# 
+		AND withdraw = 'N'
+	</select>
+
+		
+ 	<!-- 레코드값 체크 -->
+	<select id="rcCheck" parameterClass="ShopMemberManageVo" resultClass="String">
+		SELECT reg_code
+		FROM wm_member
+		WHERE member_id = #mber_id#
+		AND email = #mber_email#
+		AND withdraw = 'N'
+	</select>
+
+	
+	
+	<!-- 아이디/비밀번호 확인 -->
+	<select id="loginShopAction" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT COUNT(member_id) 
+		FROM wm_member
+		WHERE member_id = #mber_id# 
+		AND pwd = password(#mber_pw#)
+		AND withdraw = 'N'
+	</select>
+
+	<!-- 로그인 정보-->
+	<select id="selectShopMemberInfo" parameterClass="ShopMemberManageVo" resultMap="shopMemberInfo">
+		<include refid="shopMberbase" />
+		WHERE member_id = #mber_id# 
+		AND withdraw = 'N'
+	</select>
+	
+	<!-- 로그인 일자 업데이트 -->
+	<update id="updateShopLastLoginDt" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET 
+		last_con = unix_timestamp() 
+		WHERE member_id = #mber_id#
+	</update>
+	
+	<!-- 회원테이블 ID 중복체크 -->
+	<select id="shopMberIdOverlapCheck" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT COUNT(1) CNT
+		FROM wm_member
+		WHERE member_id = #mber_id#
+	</select>
+	
+	<!-- 회원테이블 email 중복체크 -->
+	<select id="shopMberEmailOverlapCheck" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT COUNT(1) CNT
+		FROM wm_member
+		WHERE email = #mber_email#
+		AND withdraw = 'N'
+	</select>
+	
+	<!-- 마이페이지 - 비밀번호 재확인 -->
+	<select id="myPwdCheck" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT COUNT(*) FROM wm_member
+		WHERE member_id = #mber_id#
+		AND pwd = password(#mber_pw#)
+		AND withdraw = 'N'
+	</select>
+		 
+	<!--회원정보수정 -->
+	<update id="updateShopMember" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET 
+		modify_date = unix_timestamp()
+		<isNotEmpty property="mber_pw">
+		,pwd	= password(#mber_pw#)
+		</isNotEmpty>		
+		<isNotEmpty property="mber_birth">
+		,birth	= #mber_birth#
+		</isNotEmpty>				
+		<isNotEmpty property="mber_gender">
+		,sex	= #mber_gender#
+		</isNotEmpty>
+		<isNotEmpty property="mber_tel">
+		,cell	= #mber_tel#
+		</isNotEmpty>
+		<isNotEmpty property="mber_email">
+		,email	= #mber_email#
+		</isNotEmpty>
+		<isNotEmpty property="mailing_yn">
+		,mailing	= #mailing_yn#
+		</isNotEmpty>
+		<isNotEmpty property="sms_yn">
+		,sms	= #sms_yn#
+		</isNotEmpty>
+		<isNotEmpty property="zipcode">
+		,zip	= #zipcode#
+		</isNotEmpty>
+		<isNotEmpty property="addr">
+		,addr1	= #addr#
+		</isNotEmpty>
+		<isNotEmpty property="addr_detail">
+		,addr2	= #addr_detail#
+		</isNotEmpty>
+		<isNotEmpty property="mber_status">
+		,withdraw	= #mber_status#
+		</isNotEmpty>
+		WHERE member_id = #mber_id#
+	</update>
+	
+	<!--회원 Pw 수정  id 값으로 -->
+	<update id="updatePw" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET
+		modify_date = unix_timestamp()
+		<isNotEmpty property="mber_pw">
+		,pwd		= password(#mber_pw#)
+		</isNotEmpty>
+		<isNotEmpty property="reg_code">
+		,reg_code		= #reg_code#
+		</isNotEmpty>
+		WHERE member_id = #mber_id# 
+	</update>
+	
+	<!--회원 Pw 수정 reg 값으로 -->
+	<update id="mupdatePw" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET
+		modify_date = unix_timestamp()
+		<isNotEmpty property="mber_pw">
+		,pwd		= password(#mber_pw#)
+		</isNotEmpty>
+		<isNotEmpty property="reg_code">
+		,reg_code		= #reg_code#
+		</isNotEmpty>
+		where reg_code = #reg_code#
+		and (reg_code is not null and reg_code != '')
+	</update>
+	
+	<!-- 회원테이블 DI 중복체크 -->
+	<select id="shopMberDIOverlapCheck" parameterClass="ShopMemberManageVo" resultClass="int">
+		SELECT COUNT(1) CNT
+		FROM wm_member
+		WHERE reg_code = #reg_code#
+	</select>	
+	
+	
+	<select id="selectadminMemberList" parameterClass="ShopMemberManageVo" resultMap="shopMemberInfoAdmin" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="shopMberbase"/>
+				 	 WHERE 1 = 1
+				 	 
+					<isNotEmpty property="scType">
+						 <isEqual property="scType" compareValue="id">
+							AND member_id like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="name">
+							AND name like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="tel">
+							AND cell like concat('%',#srch_input#,'%')
+						 </isEqual>
+					 </isNotEmpty>
+	 				<isEmpty property="scType">
+		 				<isNotEmpty property="srch_input">
+							AND (member_id like concat('%',#srch_input#,'%') OR name like concat('%',#srch_input#,'%') OR cell like concat('%',#srch_input#,'%'))
+		 				</isNotEmpty>
+	 				</isEmpty>
+	 				<isNotEmpty property="mber_status">
+			 	 		AND withdraw = #mber_status#
+			 		</isNotEmpty>
+				 	<isNotEmpty property="srch_date">
+				 		AND reg_date <![CDATA[>=]]> UNIX_TIMESTAMP(#srch_date#)
+				 	</isNotEmpty>
+				 	<isNotEmpty property="srch_date2">
+				 		AND reg_date <![CDATA[<=]]> UNIX_TIMESTAMP(#srch_date2#)
+				 	</isNotEmpty>					 	 
+					ORDER BY no DESC
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 회원 리스트 카운트 -->
+	<select id="selectadminMemberListCnt" parameterClass="ShopMemberManageVo" resultClass="int" >
+		SELECT
+			    COUNT(1) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 				<include refid="shopMberbase"/>
+ 				WHERE 1 = 1
+				<isNotEmpty property="scType">
+					 <isEqual property="scType" compareValue="id">
+						AND member_id like concat('%',#srch_input#,'%')
+					 </isEqual>
+					 <isEqual property="scType" compareValue="name">
+						AND name like concat('%',#srch_input#,'%')
+					 </isEqual>
+					 <isEqual property="scType" compareValue="tel">
+						AND cell like concat('%',#srch_input#,'%')
+					 </isEqual>
+				 </isNotEmpty>
+ 				<isEmpty property="scType">
+	 				<isNotEmpty property="srch_input">
+						AND (member_id like concat('%',#srch_input#,'%') OR name like concat('%',#srch_input#,'%') OR cell like concat('%',#srch_input#,'%'))
+	 				</isNotEmpty>
+ 				</isEmpty> 				
+ 				<isNotEmpty property="mber_status">
+			 	 		AND withdraw = #mber_status#
+			 	</isNotEmpty>
+			 	<isNotEmpty property="srch_date">
+			 			AND reg_date <![CDATA[>=]]> UNIX_TIMESTAMP(#srch_date#)
+			 	</isNotEmpty>
+			 	<isNotEmpty property="srch_date2">
+			 	 		AND reg_date <![CDATA[<=]]> UNIX_TIMESTAMP(#srch_date2#)
+			 	</isNotEmpty>					 	 
+			) Y
+		 ) Z
+	</select>
+	
+	
+	<!-- 회원정보 엑셀다운로드 -->
+	<select id="selectadminMemberListExcel" parameterClass="ShopMemberManageVo" resultMap="shopMemberInfoAdmin" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="shopMberbase"/>
+				 	 WHERE 1 = 1
+				 	 
+					<isNotEmpty property="scType">
+						 <isEqual property="scType" compareValue="id">
+							AND member_id like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="name">
+							AND name like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="email">
+							AND email like concat('%',#srch_input#,'%')
+						 </isEqual>
+					 </isNotEmpty>
+	 				<isEmpty property="scType">
+		 				<isNotEmpty property="srch_input">
+							AND (member_id like concat('%',#srch_input#,'%') OR name like concat('%',#srch_input#,'%') OR email like concat('%',#srch_input#,'%'))
+		 				</isNotEmpty>
+	 				</isEmpty>
+	 				<isNotEmpty property="mber_status">
+			 	 		AND withdraw = #mber_status#
+			 		</isNotEmpty>
+				 	<isNotEmpty property="srch_date">
+				 		AND reg_date <![CDATA[>=]]> UNIX_TIMESTAMP(#srch_date#)
+				 	</isNotEmpty>
+				 	<isNotEmpty property="srch_date2">
+				 		AND reg_date <![CDATA[<=]]> UNIX_TIMESTAMP(#srch_date2#)
+				 	</isNotEmpty>					 	 
+					ORDER BY no DESC
+				  ) Y
+		     ) Z
+	</select>
+	
+	
+	<!-- 마이페이지 - 회원탈퇴(1) -->
+	<select id="getMyInfoForLeave" parameterClass="ShopMemberManageVo" resultMap="shopMemberInfo">
+		<include refid="shopMberbase" />
+		WHERE member_id = #mber_id#
+		AND pwd = password(#mber_pw#)
+	</select>
+	
+	<!-- 마이페이지 - 회원탈퇴(2) -->
+	<update id="updateMyWithdrawInfo" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET 
+		modify_date 		= unix_timestamp(),
+		withdraw			= 'Y',
+
+		reg_code			= '',
+
+		<isNotEmpty property="withdraw_content">
+		withdraw_content	= #withdraw_content#
+		</isNotEmpty>
+		WHERE member_id = #mber_id#
+	</update>
+		
+	<!-- 마이페이지 - 회원탈퇴(3) -->
+	<insert id="insertMyWithdrawInfo" parameterClass="ShopMemberManageVo">
+		INSERT INTO wm_member_deleted(
+			<!-- no, -->
+			member_id,
+			name,
+			email,
+			phone,
+			cell,
+			zip,
+            addr1,
+            addr2,
+			birth,
+			birth2,
+			gender,
+            milage,
+            emoney,
+            reg_date
+        )
+		VALUES (
+			<!-- #mber_seq#, -->
+			#mber_id#,
+			#mber_name#, 
+			#mber_email#,
+			#mber_phone#,
+			#mber_tel#, 
+			#zipcode#,
+			#addr#,
+			#addr_detail#,
+			#mber_birth#,
+			0,
+			#mber_gender#, 
+			#mber_milage#,
+			#mber_emoney#,			
+        	unix_timestamp()
+        )
+        <selectKey keyProperty="mber_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<!-- SMS 리스트 - 전체발송 - 문자 수신 동의 회원 이름 -->
+	<select id="selectAllSmsAgreeMemberName" resultClass="string">
+		SELECT GROUP_CONCAT(name) 
+		FROM wm_member
+		WHERE withdraw = 'N'  
+		AND sms = 'Y' 
+		<!-- AND phone != '' -->
+	</select>
+	
+	<!-- SMS 리스트 - 전체발송 - 문자 수신 동의 회원 아이디 -->
+	<select id="selectAllSmsAgreeMemberID" resultClass="string">
+		SELECT GROUP_CONCAT(member_id) 
+		FROM wm_member
+		WHERE withdraw = 'N'  
+		AND sms = 'Y' 
+		<!-- AND phone != '' -->
+	</select>
+	
+	<!-- SMS 리스트 - 전체발송 - 문자 수신 동의 회원 번호 -->
+	<select id="selectAllSmsAgreeMemberPhone" resultClass="string">
+		SELECT GROUP_CONCAT(cell) 
+		FROM wm_member
+		WHERE withdraw = 'N'  
+		AND sms = 'Y'  
+		<!-- AND phone != '' -->
+	</select>
+	
+	<!-- SMS 리스트 - 문자 수신 동의 회원 리스트 --> 
+	<select id="selectSmsAgreeMemberList" parameterClass="ShopMemberManageVo" resultMap="smsInfo">
+		SELECT 
+			no,	
+			member_id,
+			name,
+			cell,
+			
+			pwd,
+			sex,
+			birth,
+			email,
+			mailing,
+			sms,
+			zip,
+			addr1,
+			addr2,
+			reg_date,
+			ip,
+			withdraw,
+			withdraw_content,
+			phone,
+			milage,
+			emoney,
+			join_ref,
+			last_con
+		FROM wm_member
+		WHERE sms = 'Y' 
+		AND withdraw = 'N'
+		<isNotEmpty property="scType">
+			<isEqual property="scType" compareValue="mber_id">
+			AND member_id like concat('%',#srch_input#,'%')
+		 	</isEqual>
+		 	<isEqual property="scType" compareValue="mber_name">
+			AND name like concat('%',#srch_input#,'%')
+		 	</isEqual>
+	 	</isNotEmpty>
+		<isEmpty property="scType">
+			<isNotEmpty property="srch_input">
+			AND (member_id like concat('%',#srch_input#,'%') OR name like concat('%',#srch_input#,'%'))
+			</isNotEmpty>
+		</isEmpty>
+	</select>
+	 
+	 
+	 
+	 
+	
+	<!-- 랜덤 회원 선택 후 로그인 처리 (부하 테스트용 임시 로직) -->
+	<select id="tempRandomSelectMemberInfo" parameterClass="ShopMemberManageVo" resultMap="shopMemberInfo">
+		SELECT
+				A.no
+				,A.member_id
+				,A.pwd
+				,A.name
+				,(case when A.sex ='남' then 'M'	when A.sex ='여' then 'F' else '' end) as sex
+				,A.birth						
+				,A.cell AS cell
+				,A.email AS email
+				,A.mailing
+				,A.sms
+				,A.zip, A.addr1, A.addr2
+				,from_unixtime(A.last_con, '%Y-%m-%d %h:%m:%s') AS last_con
+				,from_unixtime(A.reg_date, '%Y-%m-%d') AS reg_date
+				,A.withdraw
+				,A.withdraw_content
+				,A.phone AS phone
+				,A.milage
+				,A.emoney
+				,A.ip					
+				,A.join_ref
+				,A.reg_code	
+				,A.di_yn
+				,ifnull(A.di_rejection_cnt,0) as di_rejection_cnt
+				,A.di_date
+		FROM wm_member A
+		WHERE (CHAR_LENGTH(cell) = 13  AND cell  NOT LIKE '%0000%')
+		AND birth != ''
+		AND withdraw = 'N'
+		AND LEVEL = 9 
+		ORDER BY RAND()
+		LIMIT 1 
+	
+	</select>
+	
+	<!-- 본인인증 거절 카운팅 증가 -->
+	<update id="updateMemberDiRejectCnt" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET 
+			 di_yn = CASE WHEN ifnull(di_rejection_cnt,0) = 2 THEN 'C' ELSE di_yn END
+			,di_rejection_cnt = ifnull(di_rejection_cnt,0) + 1
+		WHERE member_id = #mber_id#
+	</update>
+	
+	
+	<!-- 본인인증 코드 UPDATE -->
+	<update id="updateMemberDiInfo" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET 
+			 di_date = now()
+			,di_yn = 'Y'
+			,di_rejection_cnt = 0
+			<isNotEmpty property="reg_code">
+				,reg_code	= #reg_code#
+			</isNotEmpty>
+		WHERE member_id = #mber_id#
+	</update>
+	
+	
+	<!-- 본인인증 거절 카운팅 마지막으로 증가 UPDATE -->
+	<update id="updateMemberDiRejectLastCount" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET 
+			 di_yn = 'N'
+			,di_rejection_cnt = 2
+		WHERE member_id = #mber_id#
+	</update>
+	
+		
+	<!-- 본인인증 거절 처리 -->
+	<update id="updateNotCertificateMember" parameterClass="ShopMemberManageVo">
+		UPDATE wm_member SET 
+			 di_yn = 'C'
+			,di_rejection_cnt = 9
+		WHERE member_id = #mber_id#
+	</update>
+	
+	
+</sqlMap>

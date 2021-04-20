@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="MemberManage">
+	<typeAlias  alias="MemberManageVo" type="egovframework.client.member.service.MemberManageVo"/>
+	
+	<!-- 회원베이스 -->
+	<sql id="mberbase">
+	SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					A.MBER_SEQ
+					,A.MBER_ID
+					,A.MBER_NAME
+					,A.MBER_GENDER
+					,A.MBER_BIRTH						
+					,fn_decrypt(A.MBER_TEL) AS MBER_TEL
+					,fn_decrypt(A.MBER_EMAIL) AS MBER_EMAIL
+					,A.MAILING_YN
+					,A.SMS_YN
+					,A.ZIPCODE, A.ADDR, A.ADDR_DETAIL
+					,DATE_FORMAT(A.LAST_LOGIN_DT, '%Y-%m-%d') AS LAST_LOGIN_DT
+					,DATE_FORMAT(A.UPDT_DT, '%Y-%m-%d') AS UPDT_DT
+					,DATE_FORMAT(A.REG_DT, '%Y-%m-%d') AS REG_DT
+					,A.MBER_STATUS						
+				FROM COMTMEMBER A
+			 )X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	<!-- 회원가입 인서트 -->
+	<insert id="insertMember" parameterClass="MemberManageVo" >
+		INSERT INTO comtmember(
+			mber_id, mber_pw, mber_name, mber_gender, mber_birth, mber_tel, mber_email,
+            mailing_yn, agree_yn, sms_yn, zipcode, addr, addr_detail, reg_dt, reg_id,
+            reg_ip, mber_dupinfo, mber_status, mber_type
+        )
+		VALUES (
+			#mber_id#, #mber_pw#, #mber_name#, #mber_gender#, #mber_birth#, fn_encrypt(#mber_tel#), fn_encrypt(#mber_email#),
+        	#mailing_yn#, 'Y', #sms_yn#, #zipcode#, #addr#, #addr_detail#, now(), #reg_id#,
+        	#reg_ip#, #mber_dupinfo#, 'Y', 'M'    
+        )
+        <selectKey keyProperty="mber_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<!-- 아이디/비밀번호 확인 -->
+	<select id="loginAction" parameterClass="MemberManageVo" resultClass="int">
+		SELECT COUNT(mber_id) 
+		FROM comtmember
+		WHERE mber_id = #mber_id# 
+		AND mber_pw = password(#mber_pw#)
+		AND mber_type = 'M'		
+		AND mber_status = 'Y'
+	</select>
+
+	<!-- 로그인 정보-->
+	<select id="selectMemberInfo" parameterClass="MemberManageVo" resultClass="MemberManageVo">
+		<include refid="mberbase" />
+		WHERE mber_id = #mber_id# 
+		AND mber_status = 'Y'
+	</select>
+	
+	<!-- 로그인 일자 업데이트 -->
+	<update id="updateLastLoginDt" parameterClass="MemberManageVo">
+		UPDATE comtmember SET 
+		LAST_LOGIN_DT = NOW() 
+		WHERE mber_id = #mber_id#
+	</update>
+	
+	<!-- 회원테이블 ID 중복체크 -->
+	<select id="mberIdOverlapCheck" parameterClass="MemberManageVo" resultClass="int">
+		SELECT COUNT(*) CNT
+		FROM wm_member
+		WHERE MBER_ID = #mber_id#
+	</select>
+	
+	<!--회원정보수정 -->
+	<update id="updateMember" parameterClass="MemberManageVo">
+		UPDATE comtmember SET 
+		updt_dt = now()
+		,updt_id = #updt_id#		
+		<isNotEmpty property="mber_pw">
+		,mber_pw	= #mber_pw#
+		</isNotEmpty>		
+		<isNotEmpty property="mber_birth">
+		,mber_birth	= #mber_birth#
+		</isNotEmpty>				
+		<isNotEmpty property="mber_gender">
+		,mber_gender	= #mber_gender#
+		</isNotEmpty>
+		<isNotEmpty property="mber_tel">
+		,mber_tel	= fn_encrypt(#mber_tel#)
+		</isNotEmpty>
+		<isNotEmpty property="mber_email">
+		,mber_email	= fn_encrypt(#mber_email#)
+		</isNotEmpty>
+		<isNotEmpty property="mailing_yn">
+		,mailing_yn	= #mailing_yn#
+		</isNotEmpty>
+		<isNotEmpty property="sms_yn">
+		,sms_yn	= #sms_yn#
+		</isNotEmpty>
+		<isNotEmpty property="zipcode">
+		,zipcode	= #zipcode#
+		</isNotEmpty>
+		<isNotEmpty property="addr">
+		,addr	= #addr#
+		</isNotEmpty>
+		<isNotEmpty property="addr_detail">
+		,addr_detail	= #addr_detail#
+		</isNotEmpty>
+		<isNotEmpty property="mber_status">
+		,mber_status	= #mber_status#
+		</isNotEmpty>
+		WHERE mber_id = #mber_id#
+	</update>
+	
+	
+</sqlMap>

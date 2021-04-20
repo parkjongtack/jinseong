@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="File">
+
+	<!-- <typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/> -->
+	<typeAlias  alias="FileManageVo" type="egovframework.common.service.FileManageVo"/>
+
+	<resultMap id="fileList" class="egovframework.common.service.FileManageVo">
+		<result property="atch_file_id" column="ATCH_FILE_ID" columnIndex="1"/>
+		<result property="file_cn" column="FILE_CN" columnIndex="2"/>
+		<result property="file_extsn" column="FILE_EXTSN" columnIndex="3"/>
+		<result property="file_mg" column="FILE_MG" columnIndex="4"/>
+		<result property="file_sn" column="FILE_SN" columnIndex="5"/>
+		<result property="file_stre_cours" column="FILE_STRE_COURS" columnIndex="6"/>
+		<result property="orignl_file_nm" column="ORIGNL_FILE_NM" columnIndex="7"/>
+		<result property="stre_file_nm" column="STRE_FILE_NM" columnIndex="8"/>
+		<result property="creat_dt" column="CREAT_DT" columnIndex="9"/>			
+	</resultMap>
+
+	<resultMap id="fileDetail" class="egovframework.common.service.FileManageVo">
+		<result property="atch_file_id" column="ATCH_FILE_ID" columnIndex="1"/>
+		<result property="file_cn" column="FILE_CN" columnIndex="2"/>
+		<result property="file_extsn" column="FILE_EXTSN" columnIndex="3"/>
+		<result property="file_mg" column="FILE_MG" columnIndex="4"/>
+		<result property="file_sn" column="FILE_SN" columnIndex="5"/>
+		<result property="file_stre_cours" column="FILE_STRE_COURS" columnIndex="6"/>
+		<result property="orignl_file_nm" column="ORIGNL_FILE_NM" columnIndex="7"/>
+		<result property="stre_file_nm" column="STRE_FILE_NM" columnIndex="8"/>
+	</resultMap>	
+
+	<resultMap id="fileListNewBoard" class="egovframework.common.service.FileManageVo">
+		<result property="atch_file_id" column="ATCH_FILE_ID" columnIndex="1"/>
+		<result property="file_cn" column="FILE_CN" columnIndex="2"/>
+		<result property="file_extsn" column="FILE_EXTSN" columnIndex="3"/>
+		<result property="file_mg" column="FILE_MG" columnIndex="4"/>
+		<result property="file_sn" column="FILE_SN" columnIndex="5"/>
+		<result property="file_stre_cours" column="FILE_STRE_COURS" columnIndex="6"/>
+		<result property="orignl_file_nm" column="ORIGNL_FILE_NM" columnIndex="7"/>
+		<result property="stre_file_nm" column="STRE_FILE_NM" columnIndex="8"/>
+		<result property="seq" column="SEQ" columnIndex="9"/>			
+	</resultMap>
+
+	<!-- 첨부파일로 등록된 파일 목록 -->
+ 	<select id="fileManageDAO.selectFileList" parameterClass="FileManageVo" resultMap="fileList" >
+ 		SELECT 
+				CF.ATCH_FILE_ID      AS atch_file_id    
+	          , CFD.FILE_CN          AS file_cn        
+	          , CFD.FILE_SN          AS file_sn        
+	          , CFD.FILE_STRE_COURS  AS file_stre_cours
+	          , CFD.STRE_FILE_NM     AS stre_file_nm   
+	          , CFD.FILE_EXTSN       AS file_extsn     
+	          , CFD.ORIGNL_FILE_NM   AS orignl_file_nm 
+	          , CFD.FILE_MG          AS file_mg        
+	          , CF.CREAT_DT          AS creat_dt        
+	      FROM COMTNFILE CF, COMTNFILEDETAIL CFD
+		 WHERE TRIM(CF.ATCH_FILE_ID) = TRIM(#atch_file_id#)
+	       AND CF.ATCH_FILE_ID = CFD.ATCH_FILE_ID
+		   AND CF.USE_AT = 'Y'				
+		 ORDER BY CFD.FILE_SN
+ 	</select>
+ 	
+ 	<!-- 첨부파일로 등록된 파일 상세 -->
+ 	<select id="fileManageDAO.selectFileDetail" parameterClass="FileManageVo" resultMap="fileDetail" >
+ 		SELECT 
+				ATCH_FILE_ID      AS atch_file_id   
+	          , FILE_CN           AS file_cn        
+	          , FILE_SN           AS file_sn        
+	          , FILE_STRE_COURS   AS file_stre_cours
+	          , STRE_FILE_NM      AS stre_file_nm   
+	          , FILE_EXTSN        AS file_extsn     
+	          , ORIGNL_FILE_NM    AS orignl_file_nm 
+	          , FILE_MG           AS file_mg        
+		  FROM COMTNFILEDETAIL
+		 WHERE TRIM(ATCH_FILE_ID) = TRIM(#atch_file_id#)
+		   AND FILE_SN = #file_sn#
+ 	</select>
+
+	<!-- 첨부파일로 등록된 파일 목록(NewBoard) -->
+ 	<select id="fileManageDAO.selectFileListNewBoard" parameterClass="FileManageVo" resultMap="fileListNewBoard" >
+ 		SELECT 
+				CFD.ATCH_FILE_ID     AS atch_file_id    
+	          , CFD.FILE_CN          AS file_cn        
+	          , CFD.FILE_SN          AS file_sn        
+	          , CFD.FILE_STRE_COURS  AS file_stre_cours
+	          , CFD.STRE_FILE_NM     AS stre_file_nm   
+	          , CFD.FILE_EXTSN       AS file_extsn     
+	          , CFD.ORIGNL_FILE_NM   AS orignl_file_nm 
+	          , CFD.FILE_MG          AS file_mg 
+          	  , CFD.SEQ			     AS seq    
+	      FROM COMTNFILEDETAIL CFD
+		 WHERE CFD.SEQ = #seq#
+ 	</select>
+</sqlMap>

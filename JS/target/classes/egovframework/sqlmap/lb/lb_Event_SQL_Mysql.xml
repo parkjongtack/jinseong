@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="lb_EventManage">
+	<typeAlias  alias="EventManageVo" type="egovframework.client.event.service.EventManageVo"/>
+	
+	
+	<!-- 이벤트 대회신청 리스트 -->
+	<select id="lb_selectEventContestList" parameterClass="EventManageVo" resultClass="EventManageVo" >
+			SELECT
+				 cm.ct_seq
+				,cm.ct_type
+				,cm.ct_sbj
+				,cm.ct_place
+				,cm.ct_dt
+				,cm.ct_process
+				,cm.atch_file_id
+				,cm.check_yn
+				,cm.hit
+				,cm.reg_id
+				,cm.updt_id
+				,DATE_FORMAT(cm.reg_dt, '%Y-%m-%d') AS REG_DT
+				,DATE_FORMAT(cm.updt_dt, '%Y-%m-%d') AS UPDT_DT
+	  			,DATE_FORMAT(cm.app_start_dt, '%Y-%m-%d') AS APP_START_DT
+				,cm.APP_START_H
+				,cm.APP_START_M
+				,DATE_FORMAT(cm.app_end_dt, '%Y-%m-%d') AS APP_END_DT
+				,cm.APP_END_H
+				,cm.APP_END_M	  
+				,(SELECT IFNULL(MAX(ntt_id),0) FROM COMTBOARD WHERE CT_SEQ = cm.CT_SEQ LIMIT 1) AS ntt_id
+				,cm.use_at
+				,cm.expose_yn
+				,cm.cut_yn
+				,cm.ct_result
+			FROM event_contest_manage cm
+			WHERE cm.use_at = 'Y'
+			AND cm.ct_type in
+			<iterate open="(" close=")" property="ct_type_arr" conjunction=",">
+			 	#ct_type_arr[]#
+			</iterate>   
+			<isNotEmpty property="scType">
+		 		<isEqual property="scType" compareValue="R">
+		 			AND (ct_process = 'R'OR ct_process = 'S')
+		 		</isEqual>
+		 	</isNotEmpty>
+		 	<isNotEmpty property="srch_input">
+		 		AND (ct_sbj like concat('%',#srch_input#,'%') OR  ct_content like concat('%',#srch_input#,'%'))
+		 	</isNotEmpty>
+			ORDER BY cm.ct_seq DESC
+			LIMIT #currRow# , 10
+	</select>
+	
+	<!-- 대회신청 리스트 카운트 -->
+	<select id="lb_selectEventContestListCnt" parameterClass="EventManageVo" resultClass="int" >
+		SELECT count(*) CNT
+		FROM event_contest_manage cm
+		WHERE cm.use_at = 'Y'
+		AND cm.ct_type in
+		<iterate open="(" close=")" property="ct_type_arr" conjunction=",">
+		 	#ct_type_arr[]#
+		</iterate>   
+		<isNotEmpty property="scType">
+	 		<isEqual property="scType" compareValue="R">
+	 			AND (ct_process = 'R'OR ct_process = 'S')
+	 		</isEqual>
+	 	</isNotEmpty>
+	 	<isNotEmpty property="srch_input">
+	 		AND (ct_sbj like concat('%',#srch_input#,'%') OR  ct_content like concat('%',#srch_input#,'%'))
+	 	</isNotEmpty>
+	</select>
+	
+	<!-- 이벤트 대회 상세 -->
+	<select id="lb_getEventContestView" parameterClass="EventManageVo" resultClass="EventManageVo" >
+			SELECT
+					 CM.CT_SEQ
+					,CM.CT_SBJ
+					,CM.CT_TYPE
+					,CM.CT_CONTENT
+					,CM.CT_PLACE
+					,CM.CT_DT
+					,CM.CT_PROCESS
+					,CM.ATCH_FILE_ID
+					,CM.LIMIT_PART
+					,CM.HIT
+					,CM.CHECK_YN
+					,CM.USE_AT
+					,IFNULL(CM.LIMIT_WAITING,0) AS LIMIT_WAITING
+					,DATE_FORMAT(CM.reg_dt, '%Y-%m-%d') AS REG_DT
+					,CM.REG_ID
+					,DATE_FORMAT(CM.updt_dt, '%Y-%m-%d') AS UPDT_DT 
+					,CM.UPDT_ID	
+					,DATE_FORMAT(CM.app_start_dt, '%Y-%m-%d') AS APP_START_DT
+					,CM.APP_START_H
+					,CM.APP_START_M
+					,DATE_FORMAT(CM.app_end_dt, '%Y-%m-%d') AS APP_END_DT
+					,CM.APP_END_H
+					,CM.APP_END_M
+					,CM.CT_GROUP
+					,CM.UPDT_YN
+					,CM.ct_bank
+					,CM.ct_acchholder
+					,CM.ct_account
+					,CM.ct_price
+					,DATE_FORMAT(CM.ct_deposit_stdt, '%Y-%m-%d') AS ct_deposit_stdt
+					,CM.ct_deposit_sth
+					,CM.ct_deposit_stm
+					,DATE_FORMAT(CM.ct_deposit_eddt, '%Y-%m-%d') AS ct_deposit_eddt
+					,CM.ct_deposit_edh
+					,CM.ct_deposit_edm
+					
+					,DATE_FORMAT(CM.refund_finish_date, '%Y-%m-%d') AS refund_finish_date
+					,CM.refund_finish_h
+					,CM.refund_finish_m
+					,CM.situation_show_yn
+					,CM.result_sms_send_yn
+ 					,CM.lane_sms_send_yn
+ 					,CM.lane_num
+ 					
+ 					
+ 					,CA.APP_CNT
+ 					,CA.part1_app_cnt
+ 					,CA.part1_wait_cnt
+ 					,CA.part2_app_cnt
+ 					,CA.part2_wait_cnt
+ 					,CA.part3_app_cnt
+ 					,CA.part3_wait_cnt
+ 					,CA.part4_app_cnt
+ 					,CA.part4_wait_cnt
+				FROM event_contest_manage CM ,
+				(
+					SELECT 
+						 IFNULL(SUM(CASE WHEN STATUS = '0004' OR STATUS = '0005' THEN 1 ELSE 0 END),0) AS APP_CNT
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '1' THEN 1 ELSE 0 END),0) AS part1_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '1' THEN 1 ELSE 0 END),0) AS part1_wait_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '2' THEN 1 ELSE 0 END),0) AS part2_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '2' THEN 1 ELSE 0 END),0) AS part2_wait_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '3' THEN 1 ELSE 0 END),0) AS part3_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '3' THEN 1 ELSE 0 END),0) AS part3_wait_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0004' AND part = '4' THEN 1 ELSE 0 END),0) AS part4_app_cnt
+						,IFNULL(SUM(CASE WHEN STATUS = '0005' AND part = '4' THEN 1 ELSE 0 END),0) AS part4_wait_cnt
+					FROM event_contest_app
+					WHERE ct_seq = #ct_seq#
+				) CA
+				WHERE CM.CT_SEQ = #ct_seq#
+		
+	</select>
+	 
+	 
+	 
+	 
+ 	<!-- 대회신청 중복체크 -->
+	<select id="lb_chkMberApp_Event" parameterClass="EventManageVo" resultClass="int">
+		SELECT COUNT(1) 
+		FROM event_contest_app
+		WHERE reg_id = #reg_id# 
+		AND ct_seq = #ct_seq#
+	</select>
+	
+
+	<!-- 이벤트 대회 조 정보 리스트 -->	
+	<select id="lb_selectEventContestPartList" parameterClass="EventManageVo" resultClass="EventManageVo">
+		SELECT 
+			ecp_seq
+			,ct_seq
+			,part_name
+			,part_ord
+		FROM event_contest_part
+		WHERE ct_seq = #ct_seq#
+		order by part_ord asc
+	</select>
+	
+	
+	
+	<!-- //이벤트 대회 신청 정보 결과 리스트 -->
+	<select id="lb_selectClientEventContestAppList" parameterClass="EventManageVo" resultClass="EventManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+			 	 		SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+						FROM (
+								SELECT
+								  app_seq, ct_seq, join_name, deposit_name,
+								  birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+								  disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+								  ,IFNULL(waiting_num,0) as waiting_num
+								  ,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f ,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l
+								  ,IFNULL(pay_flag,'N') as pay_flag	    
+								FROM event_contest_app
+								WHERE 1 = 1
+								AND ct_seq = #ct_seq#
+								<isNotNull property="part">
+							 		<isNotEmpty property="part">
+							 	 		AND part = #part#			
+								 	</isNotEmpty>
+							 	</isNotNull>		
+							 	<isNull property="status">
+							 	 	ORDER BY app_seq, reg_dt ASC
+						 	 	</isNull>		
+						 	 	<isNotNull property="status">
+							 	 	<isNotEmpty property="status">
+							 	 		AND STATUS = #status#
+							 	 		<isEqual property="status" compareValue="0005" >
+											ORDER BY waiting_num ASC
+							 	 		</isEqual>
+							 	 		<isNotEqual property="status" compareValue="0005" >
+								 	 		ORDER BY app_seq, reg_dt ASC
+							 	 		</isNotEqual>
+							 	 	</isNotEmpty>
+						 	 	</isNotNull>	
+						)X,(SELECT @ROWNUM := 0) R
+				  ) Y
+		     ) Z
+	      	<isNotEmpty property="ct_type">
+				<isEqual property="ct_type" compareValue="L" >
+					<isNotEmpty property="status">
+		 	 			<isEqual property="status" compareValue="0005" >
+			 	 			limit 3
+		 	 			</isEqual>
+	 	 			</isNotEmpty>
+				</isEqual>
+				<isEqual property="ct_type" compareValue="A" >
+					<isNotEmpty property="status">
+		 	 			<isEqual property="status" compareValue="0005" >
+			 	 			limit 4
+		 	 			</isEqual>
+	 	 			</isNotEmpty>
+				</isEqual>
+			</isNotEmpty>
+	</select>
+	
+	
+	<!-- 마이페이지 - 대회신청내역 상세 -->
+	<select id="lb_selectMyEventContestView" parameterClass="EventManageVo" resultClass="EventManageVo">
+		SELECT
+			ca.app_seq,
+			ca.ct_seq,
+			ca.join_name,
+			ca.deposit_name,
+			ca.birth,
+			ca.gender,
+			fn_decrypt(ca.telno) as telno,
+			fn_decrypt(ca.email) as email,
+			ca.disable_yn,
+			ca.handicap,
+			ca.part,
+			ca.lane,
+			ca.status,
+			ca.waiting_num,
+			ca.reg_id,
+			DATE_FORMAT(ca.reg_dt, '%Y-%m-%d') reg_dt,
+			(select updt_yn from event_contest_manage where ct_seq = ca.ct_seq) as updt_yn,
+			ca.pay_flag,
+			ca.refund_bank,
+			ca.refund_accholder,
+			ca.refund_account,
+			cm.expose_yn,
+			cm.ct_result,
+			cm.ct_process,
+			ca.option1,
+			ca.option2,
+			ca.option3,
+			ca.option4,
+			ca.option5,
+			ca.option6,
+			cm.ct_type,
+			ca.zipcode,
+			ca.addr,
+			ca.addr_detail,
+			ca.eng_first_name,
+			ca.eng_last_name,
+			IFNULL((SELECT part_ord FROM event_contest_part WHERE ct_seq = ca.ct_seq AND ecp_seq = ca.part),1) AS part_ord,
+			IFNULL((SELECT part_name FROM event_contest_part WHERE ct_seq = ca.ct_seq AND ecp_seq = ca.part),'') AS part_name
+		FROM event_contest_app ca
+		JOIN event_contest_manage cm
+		WHERE cm.ct_seq = ca.ct_seq
+		AND ca.ct_seq = #ct_seq# 
+		AND ca.reg_id = #reg_id#
+		ORDER BY ca.reg_dt DESC
+		LIMIT 1
+	</select>
+	
+	
+	<!-- 마이페이지 - 이벤트대회 대기조에서 1명 추출하기 -->
+	<select id="lb_selectEventContstBackupMember" parameterClass="EventManageVo" resultClass="EventManageVo">
+		SELECT
+			app_seq,
+			ct_seq,
+			join_name,
+			deposit_name,
+			birth,
+			gender,
+			fn_decrypt(telno) AS telno,
+			fn_decrypt(email) AS email,
+			disable_yn,
+			handicap,
+			part,
+			lane,
+			STATUS,
+			waiting_num,
+			reg_id, 
+			DATE_FORMAT(reg_dt, '%Y-%m-%d') reg_dt
+		FROM event_contest_app
+		WHERE STATUS = '0005' 
+		AND waiting_num != 0 
+		AND ct_seq = #ct_seq#
+		AND part = #part#
+		ORDER BY waiting_num ASC
+		LIMIT 1
+	</select>
+	
+	<!-- 이벤트 대회 참가자 대상 체크 -->
+	<select id="lb_getEventContestAppTargetCnt" parameterClass="EventManageVo" resultClass="int">
+		select count(1) cnt
+		from event_contest_app_target
+		where ct_seq = #ct_seq#
+		and t_reg_id = #reg_id#
+	</select>
+	
+		
+	<!-- 이벤트 대회 선정자 리스트 엑셀 -->
+	<select id="lb_getEventContestSelectResultExcel" parameterClass="EventManageVo" resultClass="EventManageVo" >
+		SELECT
+			app_seq, ct_seq, join_name, deposit_name,
+			birth, gender, fn_decrypt(telno) as telno, fn_decrypt(email) as email, 
+			disable_yn, handicap, part, lane, status, agree_yn, reg_dt, reg_id
+			,SUBSTR(lane,1,(INSTR(lane, '-')-1)) AS lane_f
+			,SUBSTR(lane,(INSTR(lane, '-')+1)) AS lane_l	  
+		FROM event_contest_app
+		WHERE ct_seq = #ct_seq#
+		AND part = #part#
+		AND status = '0004'
+		ORDER BY lane_f*1,lane_l*1		
+	</select>
+	
+		
+	<!-- 파트별 신청자 카운트 -->
+	<select id="lb_selectEventContestAppPartApplyCnt" parameterClass="EventManageVo" resultClass="EventManageVo" >
+		SELECT cp.ecp_seq AS part, cp.part_ord ,cp.part_name ,IFNULL(SUM(CASE WHEN cp.ecp_seq = ap.part THEN 1 ELSE 0 END),0) AS app_cnt
+		FROM event_contest_part cp
+		LEFT OUTER JOIN event_contest_app ap
+		ON ap.ct_seq = cp.ct_seq
+		WHERE cp.ct_seq = #ct_seq#
+		GROUP BY cp.ecp_seq
+		ORDER BY cp.part_ord ASC	
+	</select>
+	
+	
+	
+	
+
+	
+</sqlMap>

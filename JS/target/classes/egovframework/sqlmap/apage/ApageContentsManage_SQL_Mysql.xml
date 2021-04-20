@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ApageContentsManage">
+	<typeAlias  alias="apageContentsManageVo" type="egovframework.apage.system.service.apageSystemManageVo"/>
+	
+	<!-- 메뉴별 콘텐츠 불러오기 -->
+	<select id="getContentsView" parameterClass="apageContentsManageVo" resultClass="apageContentsManageVo">
+		SELECT
+				 MENU_CD
+				,MENU_NM				
+				,CONTENTS
+				,ATCH_FILE_ID
+				,REG_ID
+				,DATE_FORMAT(REG_DATE, '%Y-%m-%d') AS REG_DATE
+		FROM 	COMTCONTENTS
+		WHERE	
+		1=1
+		<isNotEmpty property="menu_cd">
+		AND MENU_CD = #menu_cd#
+		</isNotEmpty>
+		
+		<isNotEmpty property="parent_cd">
+		AND MENU_CD like concat('%',#parent_cd#,'%')
+		</isNotEmpty>
+		ORDER BY MENU_CD ASC
+	</select>
+	
+	<!-- 컨텐츠 등록  -->
+	<insert id="insertContents" parameterClass="apageContentsManageVo">
+		INSERT INTO COMTCONTENTS
+		(
+ 			MENU_CD, MENU_NM, CONTENTS, ATCH_FILE_ID, REG_ID, REG_DATE
+		)
+		VALUES
+		(
+			#menu_cd#, #menu_nm#, #contents#, #atch_file_id#, #reg_id#, NOW()
+		)
+		<selectKey keyProperty="seq" resultClass="int">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<!-- 컨텐츠 수정 -->
+	<update id="updateContents" parameterClass="apageContentsManageVo">
+		UPDATE COMTCONTENTS SET 
+		CONTENTS = #contents#,
+		ATCH_FILE_ID = #atch_file_id#,
+		UPDT_ID  = #updt_id#,
+		UPDT_DATE = NOW()
+		WHERE MENU_CD = #menu_cd#
+	</update>
+</sqlMap>

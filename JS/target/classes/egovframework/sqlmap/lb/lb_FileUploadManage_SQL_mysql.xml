@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="lb_FileUploadManage">
+    <typeAlias  alias="fileManageVo" type="egovframework.common.service.FileManageVo"/>
+
+    <insert id="insertFileMaster" parameterClass="fileManageVo" >
+		INSERT INTO COMTNFILE 
+		    ( ATCH_FILE_ID
+		    , CREAT_DT
+		    , USE_AT )
+		VALUES
+		    ( #atch_file_id#
+		    , NOW()
+		    , 'Y' )
+	</insert>
+	
+	<insert id="insertFileDetail" parameterClass="fileManageVo" >
+		INSERT INTO COMTNFILEDETAIL
+		    ( ATCH_FILE_ID
+		    , FILE_SN
+		    , FILE_STRE_COURS
+		    , STRE_FILE_NM
+		    , ORIGNL_FILE_NM
+		    , FILE_EXTSN
+		    , FILE_MG
+		    , FILE_CN
+		    , FILE_GU )
+		VALUES
+		    ( #atch_file_id#
+		    , #file_sn#
+		    , #file_stre_cours#
+		    , #stre_file_nm#
+		    , #orignl_file_nm#
+		    , #file_extsn#
+		    , #file_mg#
+		    , #file_cn#
+		    , #file_gu# )
+	</insert>
+	
+	<select id="getMaxFileSN" parameterClass="fileManageVo"  resultClass="java.lang.Integer">
+			SELECT IFNULL(MAX(FILE_SN),0)+1 AS file_sn
+			FROM COMTNFILEDETAIL
+			<!-- WHERE ATCH_FILE_ID =  #atch_file_id# -->	
+			WHERE ATCH_FILE_ID LIKE CONCAT('%',#atch_file_id#,'%')	
+	</select>
+	
+	<delete id="deleteFileDetail" parameterClass="fileManageVo" >
+			DELETE FROM COMTNFILEDETAIL
+			WHERE
+				ATCH_FILE_ID = #atch_file_id#
+			AND	
+				FILE_SN = #file_sn#			
+	</delete>
+	
+	<!-- 첨부파일 리스트 -->
+	<select id="lb_getFileAttachList" parameterClass="fileManageVo" resultClass="fileManageVo" >
+		SELECT
+		      ATCH_FILE_ID
+		    , FILE_SN
+		    , FILE_STRE_COURS
+		    , STRE_FILE_NM
+		    , ORIGNL_FILE_NM
+		    , FILE_EXTSN
+		    , FILE_MG
+		    , FILE_CN
+		    , FILE_GU
+		FROM COMTNFILEDETAIL
+		WHERE ATCH_FILE_ID like concat('%',#atch_file_id#,'%')
+		<isNotEmpty property="file_gu">
+			AND FILE_GU = #file_gu#
+		</isNotEmpty>
+		ORDER BY FILE_SN ASC 
+	</select>
+ 	
+ 	<!-- 첨부파일 상세 -->
+	<select id="getFileAttachView" parameterClass="fileManageVo" resultClass="fileManageVo" >
+		SELECT
+		      ATCH_FILE_ID
+		    , FILE_SN
+		    , FILE_STRE_COURS
+		    , STRE_FILE_NM
+		    , ORIGNL_FILE_NM
+		    , FILE_EXTSN
+		    , FILE_MG
+		    , FILE_CN
+		    , FILE_GU
+		FROM COMTNFILEDETAIL
+		WHERE ATCH_FILE_ID = #atch_file_id#
+	</select>
+	
+	<!-- 첨부파일 삭제 -->
+	<delete id="setFileAttachDelete" parameterClass="fileManageVo" >
+			DELETE 	FROM COMTNFILEDETAIL
+			WHERE 	ATCH_FILE_ID = #atch_file_id#
+			AND		FILE_SN = #file_sn#			
+	</delete>
+	
+	<!-- 상위 파일테이블 데이터 삭제 -->
+	<delete id="setFileAttachDelete2" parameterClass="fileManageVo" >
+			DELETE 	FROM COMTNFILE
+			WHERE 	ATCH_FILE_ID = #atch_file_id#		
+	</delete>
+	
+	<!-- 첨부파일 상세2 -->
+	<select id="getFileAttach" parameterClass="fileManageVo" resultClass="fileManageVo" >
+		SELECT
+		     MAX(FILE_SN) as FILE_SN
+		FROM COMTNFILEDETAIL
+		WHERE ATCH_FILE_ID like concat('%',#atch_file_id#,'%')
+		ORDER BY FILE_SN DESC
+	</select>
+</sqlMap>	

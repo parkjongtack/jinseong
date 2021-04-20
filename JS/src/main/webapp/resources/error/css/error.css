@@ -1,0 +1,33 @@
+@CHARSET "UTF-8";
+
+* {padding:0; margin:0;}
+html, body { width:100%; height:100%; }
+html { overflow-y:scroll; }
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, fieldset, pre, p, input, textarea, blockquote, th, td { padding:0; margin:0; }
+body { font-size:14px; font-family:'Nanum Gothic', 'NanumGothic', 'Malgun Gothic', 'dotum', 'helvetica', 'sans-serif'; color:#555; text-align:left;}
+ul, ol, li { list-style:none; }
+
+#error_wrapper{position:absolute; top:50%; left:50%; width:466px; height:144px; margin:-72px 0 0 -233px;}
+#left{float:left; width:140px; height:143px; background:url(/resources/error/images/error_img.gif) no-repeat;}
+#right{float:right; width:304px; height:143px;}
+#right li.title500{width:303px; height:28px; background:url(/resources/error/images/error500_01.gif) no-repeat;}
+#right li.explain500{position:relative; top:25px; width:303px; height:37px;background:url(/resources/error/images/error500_02.gif) no-repeat;}
+#right li.title404{width:303px; height:28px; background:url(/resources/error/images/error404_01.gif) no-repeat;}
+#right li.explain404{position:relative; top:25px; width:303px; height:37px;background:url(/resources/error/images/error404_02.gif) no-repeat;}
+#right li.title403{width:303px; height:28px; background:url(/resources/error/images/error403_01.gif) no-repeat;}
+#right li.explain403{position:relative; top:25px; width:303px; height:37px;background:url(/resources/error/images/error403_02.gif) no-repeat;}
+#right li.text{position:relative; top:49px; width:303px; color:#888888; font-size:11px; font-weight:bold;}
+#right li.text span{color:#aaaaaa; padding:0 3px; font-weight:normal;}
+
+
+
+
+#error { position:relative; width:800px; margin:150px auto;}
+#error .e404 { height:192px; background:url(/resources/error/images/404.gif) top center no-repeat;}
+#error .e403 { height:192px; background:url(/resources/error/images/403.gif) top center no-repeat;}
+#error .e500 { height:192px; background:url(/resources/error/images/500.gif) top center no-repeat;}
+#error .etc { height:500px; background:url(/resources/error/images/error_etc.jpg) top center no-repeat;}
+#error .etc20201215 { height:500px; background:url(/resources/error/images/error_etc_20201215.jpg) top center no-repeat;}
+
+#error p { position:absolute; top:160px; left:320px;}
+#error p a { flaot:left; display:inline-block; padding:5px 18px; text-decoration:none; color:#fff; background:#333; font-size:13px; border-radius:15px;}

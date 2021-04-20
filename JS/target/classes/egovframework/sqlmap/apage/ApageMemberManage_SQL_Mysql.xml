@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="ApageMemberManage">
+	<typeAlias  alias="apageMemberManageVo" type="egovframework.apage.member.service.apageMemberManageVo"/>
+	
+	<!-- 회원베이스 -->
+	<sql id="mber_info_base">
+	SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					A.MBER_SEQ
+					,A.MBER_ID
+					,A.MBER_NAME
+					,A.MBER_GENDER
+					,A.MBER_BIRTH						
+					,fn_decrypt(A.MBER_TEL) AS MBER_TEL
+					,fn_decrypt(A.MBER_EMAIL) AS MBER_EMAIL
+					,A.MAILING_YN
+					,A.SMS_YN
+					,A.ZIPCODE, A.ADDR, A.ADDR_DETAIL
+					,A.LAST_LOGIN_DT
+					,A.UPDT_DT
+					,A.REG_DT
+					,A.MBER_STATUS	
+					,A.MBER_TYPE
+					,A.AUTH_CODE					
+				FROM COMTMEMBER A
+			 )X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	<!-- SMS 발송 기록 베이스 -->
+	<sql id="smsManagebase">
+	SELECT  @ROWNUM := @ROWNUM + 1 AS ROWNUM, X.* 
+		FROM (
+				SELECT
+					 A.SEQ
+					,A.MSG_TYPE
+					,A.MSG_CONTENT
+					,A.SEND_DATE
+					,DATE_FORMAT(A.SEND_DATE, '%Y%m') AS SMS_SEND_DATE_YM
+					,A.SEND_ID					
+				FROM SMS_MANAGE A
+				ORDER BY SEND_DATE DESC
+			 )X,(SELECT @ROWNUM := 0) R
+	</sql>
+	
+	<!-- 관리자 아이디/비밀번호 확인 -->
+	<select id="adminLoginAction" parameterClass="apageMemberManageVo" resultClass="int">
+		SELECT COUNT(mber_id) 
+		FROM comtmember
+		WHERE mber_id = #mber_id# 
+		AND mber_pw = #mber_pw#		
+		AND mber_status = 'Y'
+		AND mber_type = 'A'
+	</select>
+
+	<!-- 관리자 로그인 정보-->
+	<select id="selectAdminMemberInfo" parameterClass="apageMemberManageVo" resultClass="apageMemberManageVo">
+		<include refid="mber_info_base" />
+		WHERE mber_id = #mber_id# 
+		AND mber_type = 'A'
+		AND mber_status = 'Y'
+	</select>
+
+	<!-- 관리자 계정 중복체크 -->
+	<select id="getadminIdChk" parameterClass="apageMemberManageVo" resultClass="int">
+		SELECT COUNT(1) CNT
+		FROM comtmember
+		WHERE mber_id = #mber_id#
+	</select>
+	
+	<!-- 관리자,회원 로그인 일자 업데이트 -->
+	<update id="updateLoginDt" parameterClass="apageMemberManageVo">
+		UPDATE COMTMEMBER SET LAST_LOGIN_DT = NOW() WHERE MBER_ID = #mber_id#
+	</update>
+	
+	<!-- 관리자 인서트 -->
+	<insert id="insertAdminMember" parameterClass="apageMemberManageVo" >
+		INSERT INTO comtmember(
+			mber_id, mber_pw, mber_name, mber_tel, mber_email, reg_dt, reg_id, reg_ip, mber_status, auth_code, mber_type
+        )
+		VALUES (
+			#mber_id#, #mber_pw#, #mber_name#, fn_encrypt(#mber_tel#), fn_encrypt(#mber_email#), now(), #reg_id#, #reg_ip#, 'Y', #auth_code#, 'A'    
+        )
+        <selectKey keyProperty="mber_seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+	<!-- 회원 리스트 -->
+	<select id="selectadminMemberList" parameterClass="apageMemberManageVo" resultClass="apageMemberManageVo" >
+		SELECT
+			    Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="mber_info_base"/>
+				 	 WHERE 1 = 1
+				 	 AND MBER_TYPE = #mber_type#
+					<isNotEmpty property="scType">
+						 <isEqual property="scType" compareValue="id">
+							AND MBER_ID like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="name">
+							AND MBER_NAME like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="email">
+							AND fn_decrypt(MBER_EMAIL) like concat('%',#srch_input#,'%')
+						 </isEqual>
+					 </isNotEmpty>
+	 				<isEmpty property="scType">
+		 				<isNotEmpty property="srch_input">
+							AND (MBER_ID like concat('%',#srch_input#,'%') OR MBER_NAME like concat('%',#srch_input#,'%') OR fn_decrypt(MBER_EMAIL) like concat('%',#srch_input#,'%'))
+		 				</isNotEmpty>
+	 				</isEmpty>
+	 				<isNotEmpty property="mber_status">
+			 	 		AND MBER_STATUS = #mber_status#
+			 		</isNotEmpty>
+				 	<isNotEmpty property="srch_date">
+				 		AND DATE_FORMAT(REG_DT, '%Y-%m-%d') <![CDATA[>=]]> #srch_date#
+				 	</isNotEmpty>
+				 	<isNotEmpty property="srch_date2">
+				 		AND DATE_FORMAT(REG_DT, '%Y-%m-%d') <![CDATA[<=]]> #srch_date2#
+				 	</isNotEmpty>					 	 
+					ORDER BY MBER_SEQ DESC
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- 회원 리스트 카운트 -->
+	<select id="selectadminMemberListCnt" parameterClass="apageMemberManageVo" resultClass="int" >
+		SELECT
+			    COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 				<include refid="mber_info_base"/>
+ 				WHERE 1 = 1
+			 	AND MBER_TYPE = #mber_type#
+				<isNotEmpty property="scType">
+					 <isEqual property="scType" compareValue="id">
+						AND MBER_ID like concat('%',#srch_input#,'%')
+					 </isEqual>
+					 <isEqual property="scType" compareValue="name">
+						AND MBER_NAME like concat('%',#srch_input#,'%')
+					 </isEqual>
+					 <isEqual property="scType" compareValue="email">
+						AND fn_decrypt(MBER_EMAIL) like concat('%',#srch_input#,'%')
+					 </isEqual>
+				 </isNotEmpty>
+ 				<isEmpty property="scType">
+	 				<isNotEmpty property="srch_input">
+						AND (MBER_ID like concat('%',#srch_input#,'%') OR MBER_NAME like concat('%',#srch_input#,'%') OR fn_decrypt(MBER_EMAIL) like concat('%',#srch_input#,'%'))
+	 				</isNotEmpty>
+ 				</isEmpty> 				
+ 				<isNotEmpty property="mber_status">
+			 	 		AND MBER_STATUS = #mber_status#
+			 	</isNotEmpty>
+			 	<isNotEmpty property="srch_date">
+			 			AND DATE_FORMAT(REG_DT, '%Y-%m-%d') <![CDATA[>=]]> #srch_date#
+			 	</isNotEmpty>
+			 	<isNotEmpty property="srch_date2">
+			 	 		AND DATE_FORMAT(REG_DT, '%Y-%m-%d') <![CDATA[<=]]> #srch_date2#
+			 	</isNotEmpty>					 	 
+			) Y
+		 ) Z
+	</select>
+	
+	<!-- 회원관리 상세 -->
+	<select id="getAdminMemberView" parameterClass="apageMemberManageVo" resultClass="apageMemberManageVo">
+		SELECT
+			A.MBER_SEQ, A.MBER_ID, A.MBER_NAME, A.MBER_GENDER, A.MBER_BIRTH,						
+			fn_decrypt(A.MBER_TEL) AS MBER_TEL, fn_decrypt(A.MBER_EMAIL) AS MBER_EMAIL,
+			A.MAILING_YN, A.SMS_YN, A.ZIPCODE, A.ADDR, A.ADDR_DETAIL,
+			A.LAST_LOGIN_DT, A.UPDT_DT, A.REG_DT, A.MBER_STATUS,	
+			A.MBER_TYPE, A.AUTH_CODE					
+		FROM COMTMEMBER A
+		where A.MBER_ID = #mber_id#
+	</select>
+	
+	<!--회원정보수정 -->
+	<update id="updateAdminMember" parameterClass="apageMemberManageVo">
+		UPDATE comtmember SET 
+		updt_dt = now()
+		,updt_id = #updt_id#		
+		<isNotEmpty property="mber_pw">
+		,mber_pw	= #mber_pw#
+		</isNotEmpty>	
+		<isNotEmpty property="mber_name">
+		,mber_name	= #mber_name#
+		</isNotEmpty>		
+		<isNotEmpty property="mber_birth">
+		,mber_birth	= #mber_birth#
+		</isNotEmpty>				
+		<isNotEmpty property="mber_gender">
+		,mber_gender	= #mber_gender#
+		</isNotEmpty>
+		<isNotEmpty property="mber_tel">
+		,mber_tel	= fn_encrypt(#mber_tel#)
+		</isNotEmpty>
+		<isNotEmpty property="mber_email">
+		,mber_email	= fn_encrypt(#mber_email#)
+		</isNotEmpty>
+		<isNotEmpty property="mailing_yn">
+		,mailing_yn	= #mailing_yn#
+		</isNotEmpty>
+		<isNotEmpty property="sms_yn">
+		,sms_yn	= #sms_yn#
+		</isNotEmpty>
+		<isNotEmpty property="zipcode">
+		,zipcode	= #zipcode#
+		</isNotEmpty>
+		<isNotEmpty property="addr">
+		,addr	= #addr#
+		</isNotEmpty>
+		<isNotEmpty property="addr_detail">
+		,addr_detail	= #addr_detail#
+		</isNotEmpty>
+		<isNotEmpty property="mber_status">
+		,mber_status	= #mber_status#
+		</isNotEmpty>
+		<isNotEmpty property="auth_code">
+		,auth_code	= #auth_code#
+		</isNotEmpty>
+		WHERE mber_id = #mber_id#
+	</update>
+	
+	<!-- 회원 리스트  엑셀-->
+	<select id="selectMemberExcel" parameterClass="apageMemberManageVo" resultClass="apageMemberManageVo" >
+		SELECT Z.* FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+				 	 <include refid="mber_info_base"/>
+				 	 WHERE 1 = 1
+				 	 AND MBER_TYPE = #mber_type#
+					<isNotEmpty property="scType">
+						 <isEqual property="scType" compareValue="id">
+							AND MBER_ID like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="name">
+							AND MBER_NAME like concat('%',#srch_input#,'%')
+						 </isEqual>
+						 <isEqual property="scType" compareValue="email">
+							AND fn_decrypt(MBER_EMAIL) like concat('%',#srch_input#,'%')
+						 </isEqual>
+					 </isNotEmpty>
+	 				<isEmpty property="scType">
+		 				<isNotEmpty property="srch_input">
+							AND (MBER_ID like concat('%',#srch_input#,'%') OR MBER_NAME like concat('%',#srch_input#,'%') OR fn_decrypt(MBER_EMAIL) like concat('%',#srch_input#,'%'))
+		 				</isNotEmpty>
+	 				</isEmpty>
+	 				<isNotEmpty property="mber_status">
+			 	 		AND MBER_STATUS = #mber_status#
+			 		</isNotEmpty>
+				 	<isNotEmpty property="srch_date">
+				 		AND DATE_FORMAT(REG_DT, '%Y-%m-%d') <![CDATA[>=]]> #srch_date#
+				 	</isNotEmpty>
+				 	<isNotEmpty property="srch_date2">
+				 		AND DATE_FORMAT(REG_DT, '%Y-%m-%d') <![CDATA[<=]]> #srch_date2#
+				 	</isNotEmpty>					 	 
+					ORDER BY MBER_SEQ DESC
+				  ) Y
+		     ) Z
+	</select>
+	
+	<!-- SMS 발송 기록(sms_manage) 리스트 -->
+	<select id="selectSmsHistoryList" parameterClass="apageMemberManageVo" resultClass="apageMemberManageVo">
+		SELECT
+				Z.*
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+					<include refid="smsManagebase"/>
+				 	WHERE 1 = 1
+					<isEmpty property="msg_type"> <!-- 190114 -->
+					 	AND MSG_TYPE != '4'
+					</isEmpty>
+					<isNotEmpty property="msg_type"> <!-- 190114 -->
+					 	AND MSG_TYPE = #msg_type#
+					</isNotEmpty>
+					<isEmpty property="scType">
+						<isNotEmpty property="srch_input">
+					 		AND MSG_CONTENT like concat('%',#srch_input#,'%')
+						</isNotEmpty>
+					</isEmpty>
+					<isNotEmpty property="srch_date">
+						AND SEND_DATE <![CDATA[>=]]> #srch_date#
+					</isNotEmpty>
+					<isNotEmpty property="srch_date2">
+					 	AND SEND_DATE <![CDATA[<]]> #srch_date2# + INTERVAL 1 DAY
+					</isNotEmpty>
+				  ) Y
+		     ) Z
+		WHERE ASCNUM BETWEEN #currRow# AND #endRow#
+	</select>
+	
+	<!-- SMS 발송 기록(sms_manage) 리스트 카운트 -->
+	<select id="selectSmsHistoryListCnt" parameterClass="apageMemberManageVo" resultClass="int">
+		SELECT
+				COUNT(*) CNT
+			FROM (
+				SELECT ROWNUM AS ASCNUM, Y.*
+				FROM(
+ 				<include refid="smsManagebase"/>
+ 				WHERE 1 = 1
+ 				<isEmpty property="msg_type"> <!-- 190114 -->
+				 	AND MSG_TYPE != '4'
+				</isEmpty>
+				<isNotEmpty property="msg_type"> <!-- 190114 -->
+				 	AND MSG_TYPE = #msg_type#
+				</isNotEmpty>
+ 				<isEmpty property="scType">
+					<isNotEmpty property="srch_input">
+				 		AND MSG_CONTENT like concat('%',#srch_input#,'%')
+					</isNotEmpty>
+				</isEmpty>
+				<isNotEmpty property="srch_date">
+					AND SEND_DATE <![CDATA[>=]]> #srch_date#
+				</isNotEmpty>
+				<isNotEmpty property="srch_date2">
+				 	AND SEND_DATE <![CDATA[<=]]> #srch_date2#
+				</isNotEmpty>
+			) Y
+		) Z
+	</select>
+	
+	<!-- SMS 발송 기록(sms_manage) -->
+	<insert id="insertSmsHistoryForList" parameterClass="apageMemberManageVo">
+		INSERT INTO SMS_MANAGE
+			(
+				 msg_type
+				,msg_content
+				,send_date
+				,send_id
+			)
+		VALUES
+			(
+				 #msg_type#
+				,#msg_content#
+				,now()
+				,#send_id#
+			)
+		<selectKey keyProperty="seq" resultClass="int">
+      	  	SELECT LAST_INSERT_ID()
+   		</selectKey>
+	</insert>
+	
+</sqlMap>

@@ -1,0 +1,235 @@
+=====================================================
+e.time ==> 2021-03-14 17:56:59
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.)
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:28:09
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.)
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:28:53
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.)
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:30:15
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.)
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:32:44
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES)); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES))
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:32:45
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES)); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES))
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:32:45
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES)); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES))
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:32:46
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES)); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES))
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:32:46
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES)); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES))
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
+
+=====================================================
+e.time ==> 2021-03-14 18:33:51
+e.getMessage() ==> Request processing failed; nested exception is org.springframework.jdbc.UncategorizedSQLException: SqlMapClient operation; uncategorized SQLException for SQL []; SQL state [null]; error code [0];   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES)); nested exception is com.ibatis.common.jdbc.exception.NestedSQLException:   
+--- The error occurred in egovframework/sqlmap/lb/lb_PopupManage_SQL_Mysql.xml.  
+--- The error occurred while executing query.  
+--- Check the    SELECT    POP_SEQ    ,POP_SUBJECT    ,POP_WIDTH    ,POP_HEIGHT    ,POP_URL    ,POP_ST_DT    ,POP_ED_DT    ,POP_CONTENT    ,POP_STATE    ,POP_SET    ,POP_REG_NM    ,POP_UP_NM    ,DATE_FORMAT(POP_REG_DT, '%Y-%m-%d') AS POP_REG_DT     ,DATE_FORMAT(POP_UP_DT, '%Y-%m-%d') AS POP_UP_DT    ,POP_POSITION_X    ,POP_POSITION_Y     FROM COMTNPOPUP   WHERE POP_STATE = 'Y'   AND DATE_FORMAT(NOW(), '%Y-%m-%d') BETWEEN POP_ST_DT AND POP_ED_DT    ORDER BY POP_SEQ DESC   .  
+--- Check the SQL Statement (preparation failed).  
+--- Cause: org.apache.commons.dbcp.SQLNestedException: Cannot create PoolableConnectionFactory (Access denied for user 'jshome'@'localhost' (using password: YES))
+request.getRequestURI() ==> /main.do
+request.getMethod() ==> GET
+request.getRequestURL() ==> http://localhost:8081/main.do
+request.getHeader("User-Agent") ==> Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36
+request.getHeader("referer"); ==> null
+request IP ==> 0:0:0:0:0:0:0:1
+param ==> 
+=====================================================
